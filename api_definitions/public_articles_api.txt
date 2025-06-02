@@ -1,0 +1,97 @@
+Endpoints da API Pública para Artigos de Blog/Notícias:
+
+1.  GET /api/articles
+    *   Descrição: Lista todos os artigos publicados, ordenados geralmente do mais recente para o mais antigo.
+    *   Acesso: Público.
+    *   Query Parameters:
+        *   `page`: Número da página (Default: 1).
+        *   `limit`: Número de itens por página (Default: 10).
+        *   `category`: Filtra artigos por slug da categoria (String).
+        *   `tag`: Filtra artigos por slug da tag (String).
+        *   `sort_by`: Critério de ordenação (ex: `publishedAt`, `viewCount`. Default: `publishedAt`).
+        *   `sort_order`: Ordem de ordenação ('asc' ou 'desc'. Default: 'desc' para `publishedAt`).
+        *   `q`: Termo de pesquisa textual (para título, excerto, conteúdo).
+    *   Lógica de Filtragem Adicional:
+        *   Apenas artigos com `status: 'published'`.
+        *   Apenas artigos com `publishedAt` no passado ou presente (para lidar com agendamento).
+    *   Response (Sucesso):
+        {
+          "pagination": { /* ... */ },
+          "data": [ // Array de objetos Article (versão otimizada para listagem pública)
+            {
+              "title": "String",
+              "slug": "String",
+              "excerpt": "String, Optional",
+              "featuredImageUrl": "URLString, Optional",
+              "category": "String, Optional",
+              "tags": ["String"],
+              "authorName": "String (Nome do autor, User.name)", // Para exibição
+              "publishedAt": "Timestamp",
+              "viewCount": "Integer, Optional"
+              // Não incluir conteúdo completo aqui para performance
+            }
+          ]
+        }
+
+2.  GET /api/articles/{slug}
+    *   Descrição: Obtém os detalhes completos de um artigo específico publicado, identificado pelo seu slug.
+    *   Acesso: Público.
+    *   Path Parameter: `slug` (String, o slug único do artigo).
+    *   Lógica Adicional:
+        *   Apenas se `status: 'published'` e `publishedAt` no passado/presente.
+        *   Incrementar `viewCount` para o artigo (pode ser feito de forma assíncrona ou com otimizações para evitar escritas excessivas).
+    *   Response (Sucesso): Objeto Article completo, incluindo `content`.
+        ```json
+        {
+          "title": "String",
+          "slug": "String",
+          "content": "LongText (HTML/Markdown)",
+          "excerpt": "String, Optional",
+          "featuredImageUrl": "URLString, Optional",
+          "category": "String, Optional",
+          "tags": ["String"],
+          "author": { // Informações do autor
+            "name": "String",
+            "profilePictureUrl": "URLString, Optional",
+            "bio": "String, Optional (do perfil do User)"
+          },
+          "publishedAt": "Timestamp",
+          "updatedAt": "Timestamp",
+          "viewCount": "Integer, Optional"
+          // (Opcional) Artigos relacionados
+          // (Opcional) Informações para partilha social
+        }
+        ```
+    *   Response (Erro - 404 Not Found): Se o artigo com o slug dado não existir, não estiver publicado, ou não estiver dentro da data de publicação.
+
+3.  GET /api/articles/categories
+    *   Descrição: Lista todas as categorias de artigos disponíveis.
+    *   Acesso: Público.
+    *   Response (Sucesso):
+        ```json
+        {
+          "data": [
+            { "name": "Nome da Categoria", "slug": "slug-da-categoria", "articleCount": 15 }
+            // ... mais categorias
+          ]
+        }
+        ```
+
+4.  GET /api/articles/tags
+    *   Descrição: Lista todas as tags de artigos disponíveis.
+    *   Acesso: Público.
+    *   Response (Sucesso):
+        ```json
+        {
+          "data": [
+            { "name": "Nome da Tag", "slug": "slug-da-tag", "articleCount": 10 }
+            // ... mais tags
+          ]
+        }
+        ```
+
+Considerações:
+*   **Performance:** Para o endpoint `GET /api/articles`, evitar retornar o campo `content` completo. O `excerpt` é mais apropriado.
+*   **SEO:** URLs devem usar o `slug`. Conteúdo da página do artigo deve ser otimizado para SEO.
+*   **Contagem de Visualizações (`viewCount`):** A lógica de incremento deve ser cuidadosamente implementada para evitar race conditions ou sobrecarga, especialmente em artigos populares. Pode ser uma atualização eventual ou usar um sistema de contador mais robusto.
+*   **Comentários e Artigos Relacionados:** Podem ser endpoints separados ou incluídos na resposta de `GET /api/articles/{slug}` se a performance permitir. Para a Fase 1, podem ser omitidos.

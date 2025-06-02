@@ -1,0 +1,85 @@
+Diretrizes de Design Inicial - Plataforma CaboVerdeProperties
+
+**1. Conceito Geral e Filosofia de Design:**
+
+*   **Moderno e Minimalista:** Interface limpa, intuitiva e sem excesso de elementos visuais. O foco deve estar no conteúdo, especialmente nas imagens das propriedades.
+*   **Foco em Imagens de Alta Qualidade:** As fotografias e visualizações (incluindo as geradas por IA) são o principal atrativo. O design deve realçá-las.
+*   **Inspiração em Cabo Verde:**
+    *   **Beleza Natural:** Incorporar elementos que remetam às paisagens, oceano, praias e natureza exuberante de Cabo Verde de forma subtil.
+    *   **Potencial de Renovação e Oportunidade:** O design deve transmitir otimismo e a possibilidade de transformação e investimento.
+    *   **Acolhedor e Confiável:** A plataforma deve inspirar confiança e ser fácil de usar tanto para compradores locais quanto internacionais.
+*   **Usabilidade:** Priorizar a facilidade de navegação e a clareza da informação.
+
+**2. Paleta de Cores:**
+
+*   **Primárias (Cores Principais da Marca e Ações):**
+    *   **Azul Oceano:** `#0077B6` (Representa o mar, confiança, serenidade). Usado em botões primários, links, cabeçalhos.
+    *   **Verde Natureza:** `#2D6A4F` (Representa a vegetação, crescimento, frescor). Pode ser usado para elementos de destaque positivo ou em secções específicas.
+    *   **Amarelo Sol:** `#FFD700` (Representa o sol, energia, otimismo). Usado com moderação para CTAs secundários ou elementos que necessitem de atenção.
+*   **Secundárias (Fundos, Texto, Bordas):**
+    *   **Branco:** `#FFFFFF` (Principal cor de fundo para áreas de conteúdo, promovendo a limpeza).
+    *   **Cinza Claro (Off-white):** `#F0F0F0` ou `#F4F7F6` (Para fundos de secções, cards, para criar diferenciação suave).
+    *   **Bege Areia:** `#F5F5DC` (Pode ser usado para fundos ou elementos subtis, remetendo às praias).
+    *   **Cinza Texto Principal:** `#333333` ou `#4A4A4A` (Para corpo de texto).
+    *   **Cinza Texto Secundário:** `#757575` (Para legendas, metadados, texto menos importante).
+*   **Destaque/Acento (Para CTAs importantes, notificações, ou elementos de IA):**
+    *   **Coral Suave:** `#FF7F50` (Acolhedor, chamativo mas não agressivo).
+    *   **Verde Esmeralda Brilhante:** `#50C878` (Para sucesso, validação, ou funcionalidades "verdes"/novas).
+*   **Gradientes:** Uso subtil de gradientes (ex: azul oceano para um azul mais claro) pode ser considerado para botões ou fundos de herobanner.
+
+**3. Tipografia:**
+
+*   **Fonte para Títulos e Cabeçalhos:**
+    *   **Sugestão Principal:** Montserrat (Versátil, moderna, boa legibilidade em diversos pesos).
+    *   Alternativa: Raleway (Elegante, geométrica).
+*   **Fonte para Corpo de Texto e Elementos de UI:**
+    *   **Sugestão Principal:** Open Sans (Excelente legibilidade, neutra, amigável).
+    *   Alternativa: Lato (Moderna, equilibrada).
+*   **Hierarquia Tipográfica:**
+    *   Definir uma escala clara de tamanhos e pesos (ex: H1, H2, H3, P, Small, Caption).
+    *   Exemplo:
+        *   H1: Montserrat Bold, 32px
+        *   H2: Montserrat SemiBold, 24px
+        *   H3: Montserrat Medium, 20px
+        *   Corpo (P): Open Sans Regular, 16px
+        *   Legenda (Small): Open Sans Regular, 14px
+*   **Altura da Linha e Espaçamento:** Garantir boa legibilidade com altura de linha adequada (ex: 1.5 para corpo de texto) e espaçamento entre parágrafos.
+
+**4. Layout e Espaçamento:**
+
+*   **Whitespace (Espaço em Branco):** Uso generoso de espaço em branco para evitar poluição visual e melhorar o foco no conteúdo.
+*   **Grid System:** Basear o layout num sistema de grid (ex: 12 colunas) para consistência e alinhamento em todas as páginas.
+*   **Consistência:** Manter margens, paddings e espaçamento entre elementos consistentes.
+*   **Alinhamento:** Alinhar elementos de forma lógica para criar uma sensação de ordem.
+
+**5. Imagens:**
+
+*   **Alta Qualidade:** Essencial. Incentivar o uso de imagens de alta resolução, bem iluminadas e profissionalmente tratadas.
+*   **Proporções:** Definir proporções padrão para thumbnails de propriedades, imagens de banner, etc., para manter a consistência visual.
+*   **Otimização:** As imagens devem ser otimizadas para a web para garantir tempos de carregamento rápidos sem sacrificar muita qualidade.
+*   **Estilo das Imagens de IA:** As imagens geradas pela IA devem ser claramente identificadas como tal, mas tentar manter uma estética que se harmonize com as fotos reais.
+
+**6. Ícones:**
+
+*   **Estilo:** Outline (Contorno) ou Minimalista Sólido. Evitar ícones com muitos detalhes ou gradientes.
+*   **Consistência:** Usar ícones de uma única família/biblioteca sempre que possível.
+*   **Bibliotecas Sugeridas:**
+    *   Material Icons (Google)
+    *   Font Awesome (versão gratuita)
+    *   Tabler Icons
+    *   Feather Icons
+*   **Tamanho e Cor:** Ícones devem ser dimensionados apropriadamente para o contexto e usar cores da paleta definida (geralmente cor de texto ou uma cor de destaque).
+
+**7. Elementos Gráficos Adicionais:**
+
+*   **Padrões Subtis:** Uso muito discreto de padrões inspirados na cultura de Cabo Verde (ex: padrões de "pano di terra" estilizados, ou formas geométricas encontradas na natureza local) pode ser aplicado em fundos de secções ou como elementos decorativos.
+*   **Ilustrações:** Se usadas (ex: para páginas de erro, onboarding), devem seguir um estilo minimalista e alinhado com a identidade visual.
+*   **Sombras e Bordas:** Usar sombras suaves para dar profundidade a cards e elementos interativos. Bordas devem ser finas e usar cores secundárias.
+
+**8. Interatividade e Feedback:**
+
+*   **Hover States:** Todos os elementos interativos (links, botões, cards) devem ter estados `:hover` claros.
+*   **Focus States:** Importante para acessibilidade; garantir que elementos focáveis tenham um indicador visual.
+*   **Feedback de Ações:** Fornecer feedback imediato para ações do utilizador (ex: clique em botão, submissão de formulário).
+
+Este guia de estilo é um ponto de partida e deve evoluir com o desenvolvimento da plataforma. A chave é a consistência e a criação de uma experiência de utilizador agradável e profissional.

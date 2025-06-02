@@ -1,0 +1,161 @@
+Descrições dos Componentes de UI para Visualização Pública de Propriedades:
+
+1.  Página de Listagem de Propriedades (Pública)
+    *   URL: /imoveis (ou /properties, /listings, etc.)
+    *   Título da Página: "Imóveis em Cabo Verde", "Encontre a sua Propriedade de Sonho", etc. (Otimizado para SEO)
+    *   **Layout Geral:**
+        *   Secção de Pesquisa e Filtros Proeminente no Topo.
+        *   Área de Conteúdo Principal:
+            *   Tabs ou seletor para alternar entre "Listagem" (grelha/lista), e "Mapa".
+            *   Controlos de Ordenação: Dropdown (ex: "Mais Recentes", "Preço Ascendente", "Preço Descendente", "Relevância"). Visível na vista de "Listagem".
+            *   Área de Exibição dos Resultados (Listagem ou Mapa).
+            *   Paginação (aplicável à vista de "Listagem").
+    *   **Secção de Pesquisa e Filtros (Painel ou Barra Lateral):**
+        *   **Campo de Pesquisa por Texto Livre (q):** Input de texto grande e visível. Placeholder: "Pesquise por local, tipo, características..."
+        *   **Filtros Detalhados:**
+            *   Localização:
+                *   Dropdown "Ilha(s)": (Permitir seleção múltipla ou única).
+                *   Dropdown "Concelho(s)": (Permitir seleção múltipla ou única, pode ser dinâmico baseado na ilha ou listar todos com indicação da ilha).
+            *   Tipo de Propriedade (propertyType): Dropdown ou Checkboxes (Casa, Apartamento, Terreno, Ruína, Comercial, etc. - permitir seleção múltipla).
+            *   Faixa de Preço (priceMin, priceMax): Dois inputs numéricos (Mínimo e Máximo) ou um slider de intervalo.
+            *   Faixa de Área Construída (sizeBuiltMin, sizeBuiltMax): Dois inputs numéricos ou slider. (Opcional, pode ser simplificado para "Área Mínima").
+            *   Faixa de Área do Terreno (sizeLandMin, sizeLandMax): Dois inputs numéricos ou slider. (Opcional).
+            *   Quartos (bedroomsMin, bedroomsMax opcional): Dropdown/Botões (Ex: "1+", "2+", "3+", "4+", ou intervalo).
+            *   Casas de Banho (bathroomsMin, bathroomsMax opcional): Dropdown/Botões.
+            *   Características Adicionais (otherFeatures): Campo de input de tags (autocompletar com base nas tags existentes) ou uma lista de checkboxes para as características mais comuns (ex: "Vista Mar", "Piscina", "Garagem", "Para Renovar", "Jardim Privado").
+            *   Checkbox "Apenas Propriedades em Destaque" (isFeatured).
+        *   **Ações de Filtro:**
+            *   Botão "Aplicar Filtros" / "Pesquisar".
+            *   Botão/Link "Limpar Filtros" (reseta todos os campos para o padrão).
+            *   (Consideração) Filtros podem aplicar automaticamente ao mudar (debounce na pesquisa por texto e inputs).
+    *   **Vista de Listagem (Grelha/Lista):**
+        *   Alternador de Grelha/Lista.
+        *   Item de Propriedade (Card ou Linha) - como definido anteriormente:
+            *   Imagem Principal: Clicável.
+            *   Título.
+            *   Localização Resumida.
+            *   Preço.
+            *   Informações Chave (Quartos, WC, Área).
+            *   Tipo de Propriedade.
+            *   Selo "Destaque" (se aplicável).
+            *   Link/Botão "Ver Detalhes".
+        *   Paginação (como definido anteriormente).
+    *   **Vista de Mapa Interativo:**
+        *   **Exibição:** Ocupa a área de conteúdo principal quando a tab "Mapa" está selecionada.
+        *   **Fonte de Dados:** Utiliza o endpoint `GET /api/properties/map` com os mesmos filtros aplicados na pesquisa.
+        *   **Funcionalidades do Mapa:**
+            *   Provedor: Google Maps, Leaflet com OpenStreetMap, Mapbox, etc.
+            *   Marcadores (Pins): Um marcador para cada propriedade retornada.
+                *   Design do Marcador: Pode variar ligeiramente por tipo de propriedade ou preço.
+                *   Clusterização: Agrupar marcadores próximos em níveis de zoom mais baixos para melhor performance e visualização.
+            *   Info-Window ao Clicar no Marcador:
+                *   Mostra uma pequena janela com: Imagem thumbnail da propriedade, Título (curto), Preço, Quartos/WC (se aplicável), Link para "Ver Detalhes" (abre a página de detalhe da propriedade).
+            *   Controlos do Mapa: Zoom In/Out, Pan, (Opcional) Street View, (Opcional) "Desenhar área no mapa" para pesquisa.
+            *   Centralização e Nível de Zoom Inicial: Pode ser baseado na ilha/concelho selecionado ou centralizado em Cabo Verde se nenhum filtro geográfico específico for aplicado.
+        *   **Interação:**
+            *   O mapa atualiza dinamicamente quando os filtros na secção de Pesquisa e Filtros são alterados.
+            *   Clicar num marcador ou na sua info-window direciona para a página de detalhe da propriedade correspondente.
+            *   (Opcional) Passar o mouse sobre um item na lista/grelha pode destacar o marcador correspondente no mapa e vice-versa.
+
+2.  Página de Detalhe da Propriedade (Pública)
+    *   URL: /imovel/{slugDaPropriedade} (ex: /imovel/santiago-praia-moradia-t3-vista-mar)
+    *   (Sem alterações significativas nesta secção baseadas na pesquisa/filtros, mas o mapa na página de detalhe deve ser consistente)
+    *   Título da Página: [Título da Propriedade] - [Localização] | CaboVerdeProperties (Otimizado para SEO)
+    *   **Layout Geral:**
+        *   Breadcrumbs: Ex: Home > Imóveis > Santiago > Praia > Moradia T3 com Vista Mar...
+        *   Coluna Principal (ou secção larga) com informações da propriedade.
+        *   (Opcional) Sidebar com informações de contacto do agente/anunciante, propriedades relacionadas, ou publicidade.
+    *   **Secção Principal de Mídia:**
+        *   Galeria de Imagens:
+            *   Visualizador de imagens grandes e de alta qualidade.
+            *   Thumbnails para navegação rápida.
+            *   Opção de lightbox/fullscreen.
+            *   Suporte para gestos (swipe) em mobile.
+        *   Player de Vídeo Embutido: Se `videoLink` existir, mostrar o vídeo (YouTube, Vimeo).
+    *   **Secção de Informações Detalhadas:**
+        *   Título Completo da Propriedade.
+        *   Preço: Grande destaque.
+            *   (Opcional) Conversor de Moeda (para EUR, USD) interativo.
+        *   Localização Detalhada:
+            *   Texto: Ilha, Concelho, Bairro/Zona, Endereço (se apropriado para exibição pública).
+            *   **Mapa Interativo (Detalhe):** Google Maps embutido ou similar, mostrando a localização exata da propriedade (se `locationGpsCoordinates` estiver disponível e a política de privacidade permitir). Deve ser claramente indicado se a localização é exata ou aproximada.
+        *   Atributos Principais:
+            *   Tipo de Propriedade.
+            *   Estado da Propriedade (Novo, Usado, etc.).
+            *   Área Construída (m²).
+            *   Área do Terreno (m² ou hectares).
+            *   Número de Quartos.
+            *   Número de Casas de Banho.
+        *   Descrição Completa: Texto longo formatado (parágrafos, listas).
+        *   Outras Características: Lista de tags/ícones (ex: Ar Condicionado, Varanda, Segurança 24h).
+        *   Documentação Disponível: Descrição fornecida pelo admin.
+    *   **Call-to-Action (CTA) e Interação:**
+        *   **Botão "Mostrar Interesse":**
+            *   Texto Padrão: "Estou Interessado" ou "Mostrar Interesse".
+            *   Visibilidade: Sempre visível na página de detalhe da propriedade.
+            *   Comportamento:
+                *   **Utilizador Não Logado:**
+                    *   Ao clicar, abre um modal/popup solicitando "Login" ou "Registo".
+                    *   Mensagem no modal: "Para manifestar interesse, por favor, faça login ou crie uma conta."
+                    *   Links diretos para as páginas de login e registo.
+                    *   (Alternativa menos ideal para Fase 1: Mostrar uma mensagem a dizer "Faça login para mostrar interesse".)
+                *   **Utilizador Logado:**
+                    *   Ao clicar, o botão pode expandir para mostrar um campo de texto opcional para `message`.
+                    *   Campo de Mensagem (Opcional, para Fase 1):
+                        *   `textarea` com placeholder: "Opcional: Envie uma mensagem ao anunciante (ex: gostaria de saber mais sobre...)"
+                        *   Limite de caracteres visível (ex: 250 caracteres).
+                    *   Botão de Submissão: "Enviar Interesse" (após preencher mensagem ou se não houver campo de mensagem).
+                    *   Ação de Submissão: Envia uma requisição `POST /api/properties/{propertyId}/interests` com o `propertyId` e a `message` (se existir).
+                    *   Feedback Visual Imediato:
+                        *   Durante o envio: O botão pode mostrar um spinner/loading.
+                        *   Após Sucesso: O botão muda de estado (ex: fica desabilitado) e texto para "Interesse Enviado ✓" ou "Contacto Recebido!". Uma pequena mensagem de confirmação ("O seu interesse foi registado com sucesso!") pode aparecer brevemente.
+                        *   Após Erro: Mostra uma mensagem de erro (ex: "Ocorreu um erro. Tente novamente." ou erro específico da API).
+            *   Consideração: Se o utilizador já manifestou interesse anteriormente nesta propriedade, o botão pode já aparecer no estado "Interesse Enviado" ou permitir enviar uma nova mensagem/atualizar interesse.
+        *   **Secção "Transformar com IA" (Visível apenas para utilizadores logados):**
+            *   Título da Secção: "Experimente uma Transformação com IA!" ou "Visualize o Potencial".
+            *   Condição de Exibição: Apenas se o utilizador estiver logado e tiver transformações restantes (`transformationsRemainingToday > 0` ou se o limite ainda não foi verificado).
+            *   **Componentes:**
+                1.  **Seleção de Imagem da Galeria:**
+                    *   Exibir miniaturas das imagens da galeria da propriedade.
+                    *   Permitir ao utilizador clicar numa imagem para selecioná-la como base para a transformação. A imagem selecionada é destacada ou exibida numa área maior.
+                    *   Default: A imagem principal da galeria pode ser pré-selecionada.
+                2.  **Campo de Prompt de Texto:**
+                    *   `textarea` para o utilizador descrever a transformação.
+                    *   Placeholder: "Ex: 'Sala de estar com estilo moderno, cores neutras e muita luz natural', 'Remover móveis antigos e adicionar decoração minimalista', 'Pintar paredes de azul claro e adicionar plantas'".
+                    *   (Opcional) Botão "Ver Sugestões de Prompt" que mostra exemplos.
+                3.  **(Opcional para PoC) Seleção de Estilo Pré-definido (`stylePreset`):**
+                    *   Dropdown com 2-3 opções: "Nenhum Estilo Específico", "Design Moderno", "Renovação Tradicional", "Toque Luxuoso".
+                    *   A seleção de um estilo pode pré-preencher/adicionar texto ao prompt ou ser enviado como um parâmetro separado.
+                4.  **Botão de Ação:** "Transformar Imagem".
+                    *   Desabilitado se nenhuma imagem estiver selecionada ou o prompt estiver vazio.
+                    *   Ao clicar: Envia a requisição para `POST /api/ai/transform-image` com `baseImageUrl` (URL da imagem selecionada da galeria), `prompt` e `stylePreset` (se houver).
+                5.  **Área de Exibição dos Resultados:**
+                    *   Inicialmente vazia ou mostrando a imagem original selecionada.
+                    *   Durante o processamento: Exibir um indicador de loading/progresso (ex: "A transformar a sua imagem... Isto pode levar alguns segundos.").
+                    *   Após sucesso:
+                        *   Mostrar a imagem original e a imagem transformada lado a lado, ou com um slider para comparação Antes/Depois.
+                        *   Exibir o prompt que foi utilizado.
+                        *   (Opcional) Botão para "Descarregar Imagem Transformada".
+                        *   (Opcional) Botão "Tentar Novamente" (talvez com o mesmo prompt ou um novo).
+                6.  **Exibição do Limite de Uso:**
+                    *   Texto informativo: "Você pode fazer X transformações por dia. Restam Y transformações hoje." (onde Y é `transformationsRemainingToday` da resposta da API ou do perfil do utilizador).
+                    *   Se o limite for atingido, a funcionalidade de submissão (botão "Transformar Imagem") fica desabilitada.
+                7.  **Feedback de Erro:**
+                    *   Exibir mensagens de erro claras se a API interna ou a API de IA externa falharem (ex: "Não foi possível transformar a imagem. Tente um prompt diferente.", "Limite de uso diário atingido.").
+    *   **Funcionalidades Adicionais:**
+        *   Botões de Partilha Social (Facebook, WhatsApp, Twitter, Email).
+        *   (Opcional) Adicionar aos Favoritos (requer login).
+        *   (Opcional) Imprimir página.
+        *   (Opcional) Reportar Anúncio.
+    *   **SEO e Dados Estruturados:**
+        *   Meta tags (título, descrição, imagem principal) otimizadas para a propriedade específica.
+        *   Implementação de Schema.org (ex: `RealEstateListing`, `Residence`, `Place`) para melhor indexação.
+    *   **Propriedades Relacionadas/Sugeridas:** Secção no final da página ou na sidebar.
+
+Considerações de Design:
+*   **Responsividade:** Totalmente adaptável a desktops, tablets e smartphones. Aplicar os princípios de `design/responsiveness_guidelines.txt`.
+    *   **Exemplo para Listagem de Propriedades:** Em telas <768px (mobile/tablets pequenos), a grelha de propriedades deve ser de coluna única para melhor legibilidade. Os filtros avançados podem ser acedidos através de um botão que abre um modal ou um painel off-canvas, em vez de estarem sempre visíveis. A visualização de mapa deve garantir que os controlos e info-windows sejam fáceis de usar com toque.
+    *   **Exemplo para Página de Detalhe:** A galeria de imagens deve suportar gestos de swipe em mobile. As colunas de informação podem ser empilhadas verticalmente.
+*   **Performance:** Imagens otimizadas, carregamento rápido. O mapa deve carregar marcadores de forma eficiente (ex: clusterização, carregamento apenas dos visíveis).
+*   **Acessibilidade (A11y):** Seguir as diretrizes WCAG. Controlos de filtro e mapa devem ser acessíveis.
+*   **Qualidade Visual:** Design limpo, moderno e profissional, com foco em imagens de alta qualidade das propriedades. A integração do mapa deve ser fluida.

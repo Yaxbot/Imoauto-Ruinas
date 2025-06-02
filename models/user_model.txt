@@ -1,0 +1,29 @@
+Model: User
+Fields:
+  id: UniqueID (Primary Key, Auto-generated)
+  name: String (Required)
+  email: String (Required, Unique, Valid Email Format)
+  password: HashedString (Required)
+  nationality: String (Required)
+  phone: String (Required)
+  whatsapp: String (Optional)
+  profilePicture: URLString (Optional)
+  role: Enum('common', 'admin', Default: 'common') (Required)
+  aiTransformationsToday: Integer (Default: 0, Tracks a_i_transformations_today for daily limit)
+  lastAiTransformationDate: Date (Optional, Stores the date of the last AI transformation, used to reset `aiTransformationsToday`)
+  createdAt: Timestamp (Auto-generated)
+  updatedAt: Timestamp (Auto-generated)
+Relationships:
+  - HasMany: Properties (if users can own properties directly)
+  - HasMany: Interests
+
+Logic for AI Transformation Limit:
+- When a user requests an AI transformation:
+  1. Get the current date.
+  2. If `lastAiTransformationDate` is null or is a date before the current date:
+     - Set `aiTransformationsToday` to 0.
+     - Set `lastAiTransformationDate` to the current date.
+  3. Check if `aiTransformationsToday` is less than the daily limit (e.g., 5).
+     - If yes, allow the transformation and increment `aiTransformationsToday`.
+     - If no, deny the transformation (limit reached).
+- This logic should be handled by the backend (e.g., in the `/api/ai/transform-image` endpoint).

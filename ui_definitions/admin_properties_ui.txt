@@ -1,0 +1,86 @@
+Descrições dos Componentes de UI para o Painel de Administração de Propriedades:
+
+1.  Painel de Administração - Estrutura Geral
+    *   Layout: Sidebar (Navegação Principal) e Área de Conteúdo.
+    *   Sidebar Navigation Links:
+        *   Dashboard (Visão Geral, Estatísticas - futuro)
+        *   Gerir Propriedades (Link para a Página de Listagem de Propriedades)
+        *   Gerir Utilizadores (Link para a Página de Listagem de Utilizadores - futuro)
+        *   Configurações (futuro)
+        *   Logout
+    *   Header: Pode exibir o nome do administrador logado e notificações.
+
+2.  Página de Listagem de Propriedades (Admin)
+    *   URL: /admin/properties
+    *   Título: "Gerir Propriedades"
+    *   Controlos de Filtragem e Pesquisa:
+        *   Campo de Pesquisa por Texto (para Título, Descrição, ID, etc.)
+        *   Dropdown para filtrar por Estado (Todos, Pendente Aprovação, Ativo, Vendido, Rejeitado, etc.)
+        *   Dropdown para filtrar por Ilha.
+        *   Dropdown para filtrar por Concelho (dinamicamente atualizado com base na Ilha selecionada).
+        *   Dropdown para filtrar por Tipo de Propriedade.
+        *   Botão "Aplicar Filtros" e "Limpar Filtros".
+    *   Botão Principal de Ação: "Adicionar Nova Propriedade" (leva ao Formulário de Adicionar/Editar Propriedade em modo de criação).
+    *   Tabela de Propriedades:
+        *   Colunas:
+            *   Checkbox (para ações em massa - futuro, ex: eliminar múltiplas)
+            *   ID (opcional, pode ser útil)
+            *   Thumbnail (primeira imagem da galeria, opcional)
+            *   Título (link para editar a propriedade)
+            *   Ilha
+            *   Concelho
+            *   Tipo
+            *   Preço (ex: "10.500.000 CVE")
+            *   Estado (ex: "Pendente Aprovação", "Ativo", com indicadores visuais como cores)
+            *   Data de Criação
+            *   Destaque (Sim/Não)
+            *   Ações
+        *   Ações por Linha (Botões ou Dropdown de Ações):
+            *   Ver Detalhes (abre a página pública da propriedade numa nova aba)
+            *   Editar (leva ao Formulário de Adicionar/Editar Propriedade com os dados preenchidos)
+            *   Eliminar (com diálogo de confirmação antes de chamar `DELETE /api/admin/properties/{propertyId}`)
+            *   (Opcional) Mudar Estado Rapidamente (ex: Aprovar, Rejeitar - se o fluxo permitir)
+    *   Paginação: Controlos para navegar entre páginas de resultados.
+    *   Sumário da Paginação: Ex: "Mostrando 1-10 de 123 propriedades".
+
+3.  Formulário de Adicionar/Editar Propriedade (Admin)
+    *   URL: /admin/properties/new (para adicionar) e /admin/properties/edit/{propertyId} (para editar)
+    *   Título: "Adicionar Nova Propriedade" ou "Editar Propriedade: [Título da Propriedade]"
+    *   Layout: Pode ser dividido em secções/abas para melhor organização (Ex: Informações Gerais, Localização, Mídia, Detalhes Adicionais).
+    *   Campos do Formulário (baseado em `models/property_model.txt`):
+        *   **Informações Gerais:**
+            *   Título da Propriedade (input type="text", required)
+            *   Descrição (textarea, Rich Text Editor recomendado, required)
+            *   Estado da Propriedade (select/dropdown: 'pending_approval', 'active', 'sold', 'rejected', etc., required)
+            *   Tipo de Propriedade (select/dropdown: 'land', 'house', 'apartment', etc., required)
+            *   Preço (input type="number", required)
+            *   Moeda do Preço (select/dropdown: 'CVE', 'EUR', 'USD', required, default 'CVE')
+            *   Proprietário (ownerId - select/dropdown com pesquisa de utilizadores, opcional. Poderia ser um campo de "Gestor Interno" se `ownerId` for para o dono público)
+        *   **Localização:**
+            *   Ilha (select/dropdown, required)
+            *   Concelho (select/dropdown, required, dinâmico baseado na ilha)
+            *   Bairro/Zona (input type="text", optional)
+            *   Endereço Linha 1 (input type="text", optional)
+            *   Coordenadas GPS (input type="text", formato "latitude,longitude", optional, talvez com um mapa interativo para selecionar)
+            *   Link do Mapa (input type="url", optional, ex: Google Maps link)
+        *   **Detalhes da Estrutura:**
+            *   Área Construída (m²) (input type="number", optional)
+            *   Área do Terreno (m² ou hectares) (input type="number", optional, com unidade selecionável se necessário)
+            *   Número de Quartos (input type="number", optional, visível se tipo for 'house', 'apartment')
+            *   Número de Casas de Banho (input type="number", optional, visível se tipo for 'house', 'apartment')
+        *   **Mídia:**
+            *   Galeria de Imagens (componente de upload múltiplo):
+                *   Botão "Adicionar Imagens" (abre o seletor de arquivos).
+                *   Pré-visualização das imagens carregadas/existentes com opção de remover cada uma e reordenar (arrastar e soltar).
+                *   Indicação da imagem principal/thumbnail.
+                *   Nota: O upload real pode usar `POST /api/files/upload` para cada imagem, e o formulário principal envia as URLs das imagens.
+            *   Link do Vídeo (input type="url", optional, ex: YouTube, Vimeo)
+        *   **Outras Informações:**
+            *   Documentação Disponível (textarea, optional, descrever os documentos existentes)
+            *   Outras Características (componente de input de tags/multi-select, optional, ex: 'vista_mar', 'piscina', 'jardim')
+            *   Propriedade em Destaque (checkbox, default: false)
+    *   Botões de Ação:
+        *   "Guardar Propriedade" (submete para `POST /api/admin/properties` ou `PUT /api/admin/properties/{propertyId}`)
+        *   "Cancelar" (volta para a página de listagem)
+        *   Se editando, talvez "Guardar e Continuar a Editar".
+    *   Feedback: Mensagens de sucesso ou erro após a submissão.

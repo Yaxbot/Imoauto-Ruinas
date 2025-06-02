@@ -1,0 +1,12 @@
+Model: Interest
+Fields:
+  id: UniqueID (Primary Key, Auto-generated)
+  userId: ForeignKey (References User.id, Required)
+  propertyId: ForeignKey (References Property.id, Required)
+  message: Text (Optional, if user can send a message with interest)
+  status: Enum('new', 'contacted', 'negotiating', 'closed_won', 'closed_lost', Default: 'new') (Required, For admin tracking)
+  createdAt: Timestamp (Auto-generated)
+  updatedAt: Timestamp (Auto-generated, reflects last activity or status change)
+Relationships:
+  - BelongsTo: User
+  - BelongsTo: Property

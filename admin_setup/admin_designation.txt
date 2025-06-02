@@ -1,0 +1,49 @@
+Processo de Designação de Administradores na Plataforma CaboVerdeProperties
+
+A funcionalidade de administrador é crucial para a gestão da plataforma, incluindo a aprovação de propriedades, gestão de utilizadores, e outras tarefas administrativas. Inicialmente, e antes da implementação de interfaces de administração mais robustas, a designação de administradores será realizada através de um dos seguintes métodos manuais:
+
+1.  **Acesso Direto à Base de Dados:**
+    *   Este é o método mais direto para sistemas onde a base de dados é acessível por administradores de sistema ou developers.
+    *   **Processo:**
+        1.  Identificar o registo do utilizador na tabela de utilizadores (ex: `Users` ou `Utilizadores`).
+        2.  Localizar o campo que define o papel do utilizador (ex: `role`, `user_role`, `isAdmin`).
+        3.  Modificar o valor deste campo para o utilizador específico de 'common' (ou o valor padrão para utilizadores normais) para 'admin' (ou o valor que designa um administrador).
+        4.  Salvar as alterações na base de dados.
+    *   **Considerações:** Requer conhecimento técnico e as credenciais de acesso apropriadas. Deve ser feito com cautela para evitar modificações acidentais.
+
+2.  **Interface de Gestão de Dados da Plataforma (se disponível em lovable.dev):**
+    *   Se a plataforma `lovable.dev` fornecer uma interface gráfica para visualização e edição direta dos dados das tabelas (semelhante a um phpMyAdmin, pgAdmin, ou a secção "Data" em plataformas como Firebase ou Supabase), esta pode ser utilizada.
+    *   **Processo:**
+        1.  Navegar até à tabela de utilizadores dentro da interface de gestão de dados.
+        2.  Encontrar o utilizador que se pretende designar como administrador.
+        3.  Editar o registo do utilizador, alterando o campo 'role' (ou equivalente) para 'admin'.
+        4.  Guardar as alterações através da interface.
+    *   **Considerações:** Depende da existência e das capacidades desta ferramenta na `lovable.dev`. É geralmente mais seguro do que o acesso direto à base de dados para utilizadores menos técnicos.
+
+3.  **Script de Setup Único (One-off Script):**
+    *   Um script pode ser desenvolvido e executado uma vez (ou conforme necessário) para designar um ou mais utilizadores como administradores. Este script interagiria programaticamente com a base de dados.
+    *   **Processo:**
+        1.  O script seria codificado para aceitar um identificador do utilizador (ex: email, ID de utilizador) como parâmetro.
+        2.  Conectaria à base de dados da aplicação.
+        3.  Executaria uma query de atualização para alterar o campo 'role' do utilizador especificado para 'admin'.
+        4.  Poderia incluir logging ou output para confirmar a operação.
+    *   **Exemplo (Pseudocódigo para o script):**
+        ```
+        FUNCTION designate_admin(user_email_to_promote):
+          user = FIND_USER_BY_EMAIL(user_email_to_promote)
+          IF user EXISTS THEN
+            user.role = 'admin'
+            SAVE_USER(user)
+            PRINT "Utilizador " + user_email_to_promote + " foi designado como administrador."
+          ELSE
+            PRINT "Utilizador " + user_email_to_promote + " não encontrado."
+          END IF
+        END FUNCTION
+
+        // Execução do script (exemplo)
+        designate_admin("admin_user@example.com")
+        ```
+    *   **Considerações:** Requer um ambiente para executar o script (ex: um ambiente de desenvolvimento com acesso à base de dados de produção, ou uma funcionalidade de "tarefas" na `lovable.dev`). É uma abordagem controlada e repetível se necessário.
+
+**Próximos Passos (Desenvolvimento Futuro):**
+Eventualmente, uma interface de gestão de utilizadores dentro da própria aplicação (acessível a administradores) deverá ser implementada. Esta interface permitiria que administradores existentes promovessem outros utilizadores para o papel de administrador ou removessem esse estatuto, eliminando a necessidade de intervenção manual direta na base de dados ou através de scripts.

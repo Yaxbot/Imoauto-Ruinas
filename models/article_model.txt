@@ -1,0 +1,25 @@
+Model: Article
+Fields:
+  id: UniqueID (Primary Key, Auto-generated)
+  title: String (Required, Título do artigo)
+  slug: String (Required, Unique, Gerado automaticamente a partir do título, para URLs amigáveis)
+  content: LongText (Required, Conteúdo principal do artigo. Pode ser HTML, Markdown, ou JSON de um editor rico)
+  excerpt: String (Optional, Um resumo curto ou introdução do artigo, usado em listagens)
+  authorId: ForeignKey (References User.id, Required, ID do utilizador que escreveu o artigo)
+  featuredImageUrl: URLString (Optional, URL para a imagem de destaque do artigo)
+  status: Enum('draft', 'published', 'archived', Default: 'draft') (Required, Estado de publicação do artigo)
+  category: String (Optional, Categoria principal do artigo, ex: "Notícias do Mercado", "Dicas de Investimento", "Guias Locais")
+  tags: Array[String] (Optional, Lista de tags ou palavras-chave associadas ao artigo)
+  publishedAt: Timestamp (Optional, Data e hora em que o artigo foi/será publicado. Pode ser agendado)
+  viewCount: Integer (Default: 0, Opcional, para rastrear visualizações)
+  createdAt: Timestamp (Auto-generated)
+  updatedAt: Timestamp (Auto-generated)
+
+Relationships:
+  - BelongsTo: User (Autor do artigo)
+
+Considerations:
+- `slug`: Deve ser único. A lógica de geração deve tratar colisões (ex: adicionar um sufixo numérico).
+- `content`: Para um editor WYSIWYG, o conteúdo pode ser armazenado como HTML. Para Markdown, como texto Markdown. Se for um editor baseado em blocos (como Editor.js), pode ser JSON.
+- `authorId`: Garante que o artigo está associado a um utilizador registado (idealmente um com papel de 'admin' ou 'editor').
+- `publishedAt`: Se for no futuro, o artigo tem status 'draft' e só se torna 'published' automaticamente na data especificada (requer lógica de agendamento/cron job ou verificação na query). Para simplificação inicial, pode ser a data em que o status é mudado para 'published' manualmente.

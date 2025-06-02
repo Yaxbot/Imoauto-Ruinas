@@ -1,0 +1,45 @@
+Pesquisa e Seleção de API de IA para Transformação de Imóveis (PoC)
+
+**Objetivo:** Encontrar uma API de IA com um tier gratuito viável para uma Prova de Conceito (PoC) da funcionalidade de transformação de imagens de imóveis. A prioridade é para APIs Image-to-Image.
+
+**Candidatos Considerados:**
+1.  Stability AI (Stable Diffusion API)
+2.  Replicate (Plataforma para modelos de ML, incluindo InstructPix2Pix, ControlNet)
+3.  DeepAI Image Editor API
+
+**API Escolhida para a PoC:** DeepAI Image Editor API
+
+**Justificativa:**
+*   **Simplicidade de Uso:** A API do DeepAI para edição de imagem (que funciona como image-to-image) é direta, aceitando uma URL de imagem e um prompt de texto.
+*   **Tier Gratuito:** Oferece um tier gratuito que permite um número limitado de chamadas de API por mês, suficiente para uma PoC.
+*   **Funcionalidade Image-to-Image Direta:** O endpoint "Image Editor" é especificamente o que precisamos: enviar uma imagem base e um prompt para modificá-la.
+
+**Detalhes da API Escolhida (DeepAI Image Editor):**
+
+*   **Website:** [https://deepai.org/](https://deepai.org/)
+*   **Documentação da API (Image Editor):** [https://deepai.org/machine-learning-model/image-editor](https://deepai.org/machine-learning-model/image-editor)
+*   **Como Obter a Chave de API:**
+    1.  Registar-se gratuitamente no site DeepAI: [https://deepai.org/signup](https://deepai.org/signup)
+    2.  Após o login, a chave de API é disponibilizada no dashboard do utilizador ou na página de perfil.
+*   **Endpoint Principal (para Image Editor):** `https://api.deepai.org/api/image-editor` (Método POST)
+*   **Parâmetros Principais para a Chamada (payload como `multipart/form-data`):**
+    *   `image`: URL da imagem base a ser transformada (String) OU o arquivo da imagem (File). Para a nossa API interna, provavelmente reencaminharemos uma URL pública da imagem da propriedade.
+    *   `text`: Prompt de texto descrevendo a transformação desejada (String). Ex: "Renovar esta sala com um estilo moderno e cores claras", "Adicionar uma piscina a este jardim", "Mudar a cor da fachada para azul".
+    *   (Outros parâmetros opcionais podem estar disponíveis, mas estes são os essenciais para a PoC).
+*   **Autenticação:** A chave de API é enviada no header da requisição:
+    *   `api-key: YOUR_API_KEY`
+*   **Resposta Esperada (Sucesso):**
+    ```json
+    {
+        "id": "string (id da tarefa na DeepAI)",
+        "output_url": "string (URL da imagem transformada)"
+    }
+    ```
+
+**Alternativa (Finalista):**
+*   **Stability AI:** Se a PoC com DeepAI for bem-sucedida e houver necessidade de mais flexibilidade, controlo fino sobre os parâmetros (como `image_strength`, `cfg_scale`, `style_presets` mais avançados) ou maior qualidade, a API da Stability AI seria o próximo passo lógico. Ela também oferece créditos gratuitos iniciais.
+
+**Próximos Passos para Integração:**
+1.  Obter uma chave de API da DeepAI.
+2.  Implementar a lógica no backend da `lovable.dev` para chamar esta API externa, tratando a autenticação e os parâmetros.
+3.  Gerir o uso da API (contagem de transformações por utilizador).

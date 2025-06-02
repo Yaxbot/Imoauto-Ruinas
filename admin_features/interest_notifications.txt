@@ -1,0 +1,80 @@
+Sistema de Notificação ao Administrador para Manifestações de Interesse:
+
+Quando um utilizador manifesta interesse numa propriedade, é crucial que os administradores da plataforma sejam notificados prontamente para que possam dar seguimento. Serão implementados os seguintes mecanismos de notificação:
+
+1.  **Notificação por Email ao Administrador:**
+    *   **Evento Acionador:** Sucesso na criação de um novo registo `Interest` através do endpoint `POST /api/properties/{propertyId}/interests`.
+    *   **Destinatário(s):** Um ou mais endereços de email de administração configurados no sistema (ex: `admin@caboverdeproperties.com`, `leads@caboverdeproperties.com`). A lista de emails de notificação deve ser configurável.
+    *   **Remetente:** Um endereço de email da plataforma (ex: `noreply@caboverdeproperties.com` ou `sistema@caboverdeproperties.com`).
+    *   **Assunto do Email:** "Novo Interesse Recebido: [Título da Propriedade] - [Nome do Utilizador]"
+    *   **Conteúdo do Email (HTML e Texto Simples):**
+        *   Cabeçalho: "Nova Manifestação de Interesse"
+        *   **Detalhes do Utilizador:**
+            *   Nome: [User.name]
+            *   Email: [User.email]
+            *   Telefone: [User.phone]
+            *   (Opcional) WhatsApp: [User.whatsapp]
+            *   (Opcional) Nacionalidade: [User.nationality]
+        *   **Detalhes da Propriedade:**
+            *   Título: [Property.title]
+            *   ID da Propriedade: [Property.id]
+            *   Link para a Propriedade (Página Pública): `https://[dominio_da_plataforma]/imovel/[Property.slug]`
+            *   Link para a Propriedade (Painel Admin): `https://[dominio_da_plataforma]/admin/properties/edit/[Property.id]`
+        *   **Mensagem do Utilizador (se fornecida):**
+            *   "[Interest.message]"
+        *   **Data do Interesse:** [Interest.createdAt]
+        *   **Call to Action para o Admin:** Link para "Ver todos os interesses no Painel de Administração".
+    *   **Frequência:** Imediatamente após cada novo interesse. (Considerar um sistema de resumo diário se o volume for muito alto no futuro, mas para a Fase 1, notificação imediata é preferível).
+    *   **Tecnologia:** Utilização de um serviço de email transacional (ex: SendGrid, Mailgun, AWS SES) para garantir a entrega.
+
+2.  **Secção "Interesses Recebidos" no Painel de Administração:**
+    *   **Localização:** Nova página/secção no painel de administração, acessível por um link no menu lateral (ex: "Interesses" ou "Leads").
+    *   **URL:** `/admin/interests`
+    *   **Endpoint da API para Admin:** `GET /api/admin/interests`
+        *   Query Params: `page`, `limit`, `sort_by` (ex: `createdAt_desc`), `filter_status` (Novo, Contactado, etc.), `filter_propertyId`, `filter_userId`.
+        *   Response: Lista paginada de objetos `Interest`, cada um podendo incluir detalhes do utilizador e da propriedade associados (para evitar múltiplas chamadas de API no frontend).
+            ```json
+            {
+              "pagination": { /* ... */ },
+              "data": [
+                {
+                  "id": "InterestID",
+                  "message": "String, Optional",
+                  "createdAt": "Timestamp",
+                  "status": "Enum ('new', 'contacted', 'negotiating', 'closed_won', 'closed_lost', Default: 'new')",
+                  "user": {
+                    "id": "UserID",
+                    "name": "String",
+                    "email": "String",
+                    "phone": "String"
+                  },
+                  "property": {
+                    "id": "PropertyID",
+                    "title": "String",
+                    "slug": "String"
+                  }
+                }
+              ]
+            }
+            ```
+    *   **Interface da Página de Listagem de Interesses:**
+        *   Título: "Interesses Recebidos" ou "Gestão de Leads".
+        *   Filtros: Por estado, por propriedade (pesquisar por título/ID), por utilizador (pesquisar por nome/email), por data.
+        *   Tabela de Interesses com as seguintes colunas:
+            *   Data (createdAt)
+            *   Utilizador (Nome, com link para o perfil do utilizador no admin, se existir)
+            *   Contacto do Utilizador (Email, Telefone)
+            *   Propriedade (Título, com link para a página de edição da propriedade no admin)
+            *   Mensagem (preview, com opção de ver completa)
+            *   Estado (Dropdown editável ou botões para mudar o estado: Novo, Contactado, Em Negociação, etc.)
+            *   Ações (ex: Ver Detalhes, Marcar como Lido, Adicionar Nota Interna)
+        *   Paginação.
+    *   **Página de Detalhe do Interesse (Opcional para Fase 1, pode ser um modal):**
+        *   Mostra todas as informações do interesse, do utilizador e da propriedade.
+        *   Permite adicionar notas internas (que não são visíveis ao utilizador).
+        *   Histórico de alterações de estado.
+
+Considerações Técnicas:
+*   **Modelo `Interest`:** Deve incluir um campo `status: Enum('new', 'contacted', 'negotiating', 'closed_won', 'closed_lost', Default: 'new')` para ser gerido pelo admin. Este campo não foi mencionado no Passo 4 da sub-tarefa, mas é essencial para esta funcionalidade de admin.
+*   **Segurança:** Acesso à lista de interesses e às suas ações restrito a administradores.
+*   **Escalabilidade:** O sistema de email e a base de dados devem ser capazes de lidar com um volume crescente de interesses.

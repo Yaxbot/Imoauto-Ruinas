@@ -1,0 +1,68 @@
+Componentes de UI para Visualização Pública de Blog/Notícias:
+
+**1. Página de Listagem de Artigos (Ex: /blog, /noticias)**
+
+*   **URL:** `/blog` ou `/noticias` (e URLs para categorias/tags como `/blog/categoria/{category_slug}` ou `/blog/tag/{tag_slug}`).
+*   **Título da Página:** "Blog | CaboVerdeProperties" ou "Notícias sobre Imobiliário em Cabo Verde".
+*   **Layout Geral:**
+    *   **Cabeçalho da Secção:** Pode incluir um título e uma breve descrição do blog.
+    *   **(Opcional) Filtros Visíveis:**
+        *   Dropdown ou lista de links para filtrar por Categoria.
+        *   (Opcional) Cloud de Tags ou lista de links para filtrar por Tag.
+    *   **Área de Listagem de Artigos:**
+        *   Layout em Grelha (Grid) ou Lista (o utilizador pode ter opção de alternar, ou ser fixo).
+        *   Cada item da lista/grelha é um "Cartão de Artigo".
+    *   **Paginação:** Controlos para navegar entre páginas de artigos.
+    *   **(Opcional) Sidebar:** Pode conter links para categorias, tags populares, artigos recentes, ou um campo de pesquisa específico para o blog.
+
+*   **Cartão de Artigo (Componente Reutilizável):**
+    *   **Imagem de Destaque (`featuredImageUrl`):** Clicável, leva à página do artigo.
+    *   **Título (`title`):** Grande, legível, clicável (leva à página do artigo).
+    *   **Excerto (`excerpt`):** Breve resumo do conteúdo do artigo.
+    *   **Metadados:**
+        *   Autor (`authorName`).
+        *   Data de Publicação (`publishedAt`, formatada de forma amigável).
+        *   Categoria (`category`, se aplicável, pode ser um link).
+        *   (Opcional) Tempo de Leitura Estimado.
+        *   (Opcional) Número de Visualizações (`viewCount`).
+    *   **Botão/Link "Ler Mais":** Leva à página do artigo.
+
+**2. Página de Artigo Individual (Ex: /blog/{slug})**
+
+*   **URL:** `/blog/{article_slug}` (ex: `/blog/como-investir-em-imoveis-em-santiago`).
+*   **Título da Página:** `[Título do Artigo] | CaboVerdeProperties` (Otimizado para SEO).
+*   **Layout Geral:**
+    *   **Breadcrumbs:** Ex: Home > Blog > Categoria > Título do Artigo.
+    *   **Cabeçalho do Artigo:**
+        *   Título Principal (`title`).
+        *   Imagem de Destaque (`featuredImageUrl`) - pode ser full-width ou com largura de conteúdo.
+        *   Metadados do Artigo:
+            *   Nome do Autor (`author.name`), com link para uma página de perfil do autor (se existir) ou filtragem de seus artigos.
+            *   Foto do Autor (`author.profilePictureUrl`).
+            *   Data de Publicação (`publishedAt`).
+            *   (Opcional) Data da Última Atualização (`updatedAt`, se diferente de `publishedAt`).
+            *   Categoria e Tags (com links para as respectivas páginas de listagem).
+    *   **Corpo do Conteúdo (`content`):**
+        *   Renderizado a partir de HTML/Markdown.
+        *   Tipografia clara e legível, com bom espaçamento.
+        *   Imagens embutidas no conteúdo devem ser responsivas.
+        *   Vídeos embutidos devem ser responsivos.
+        *   Code blocks (se aplicável) devem ser formatados.
+    *   **Funcionalidades Pós-Conteúdo:**
+        *   **Botões de Partilha Social:** (Facebook, Twitter, LinkedIn, WhatsApp, Email).
+        *   **(Opcional) Secção Sobre o Autor:** Pequena biografia e link para mais artigos do autor.
+        *   **(Opcional) Secção de Comentários:**
+            *   Integração com sistema de comentários (ex: Disqus, Commento, ou um sistema próprio).
+            *   Formulário para submeter comentário (requer login ou dados do comentador).
+            *   Listagem de comentários existentes.
+        *   **(Opcional) Artigos Relacionados:**
+            *   Listagem de 2-4 artigos sugeridos (baseado em categoria, tags, ou popularidade).
+            *   Exibidos como cartões menores.
+    *   **(Opcional) Sidebar:** Pode incluir links para artigos recentes, categorias, tags, ou CTAs relevantes.
+
+**Considerações de Design para Blog Público:**
+*   **Legibilidade:** Prioridade máxima para o conteúdo do artigo. Contraste adequado, tamanho de fonte confortável.
+*   **Responsividade:** Totalmente adaptável a todos os dispositivos, conforme `design/responsiveness_guidelines.txt`. O conteúdo do artigo deve fluir bem em telas pequenas.
+*   **Performance:** Otimização de imagens, carregamento rápido das páginas.
+*   **SEO:** URLs amigáveis (slugs), meta tags dinâmicas (título, descrição), dados estruturados (Schema.org `Article`, `BlogPosting`).
+*   **Navegação Clara:** Fácil para o utilizador descobrir mais conteúdo, navegar por categorias/tags, e voltar à listagem principal do blog.

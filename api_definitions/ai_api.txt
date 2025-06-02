@@ -1,0 +1,67 @@
+Endpoints da API Interna para Transformação de Imagens com IA:
+
+1.  POST /api/ai/transform-image
+    *   Descrição: Processa um pedido de transformação de imagem de um imóvel utilizando uma API de IA externa.
+    *   Proteção: Requer autenticação de utilizador (ex: papel 'common' ou 'admin').
+    *   Rate Limiting: Aplicar um limite de uso diário por utilizador (ex: 5 transformações por dia).
+    *   Request Body:
+        ```json
+        {
+          "baseImageUrl": "String, Required (URL pública da imagem da galeria da propriedade a ser transformada)",
+          "prompt": "String, Required (Descrição textual da transformação desejada, ex: 'Renovar esta sala com estilo moderno e cores claras')",
+          "stylePreset": "String, Optional (Um preset de estilo que pode ser traduzido em adições ao prompt ou parâmetros específicos da API de IA, ex: 'moderno', 'tradicional_renovado', 'luxuoso')"
+        }
+        ```
+    *   Lógica Interna:
+        1.  Verificar a autenticação do utilizador.
+        2.  Verificar o limite de uso diário de transformações para o utilizador:
+            *   Consultar os campos `aiTransformationsToday` e `lastAiTransformationDate` no modelo `User`.
+            *   Se `lastAiTransformationDate` for diferente do dia atual, resetar `aiTransformationsToday` para 0 e atualizar `lastAiTransformationDate` para o dia atual.
+            *   Se `aiTransformationsToday` >= limite diário (ex: 5), retornar erro `429 Too Many Requests`.
+        3.  Validar o `baseImageUrl` (ex: verificar se é uma URL válida, opcionalmente se pertence ao domínio esperado).
+        4.  Validar o `prompt` (ex: não vazio, limite de comprimento).
+        5.  Construir a requisição para a API de IA externa (conforme `ai_integration/api_choice.txt`, ex: DeepAI).
+            *   Incluir a chave da API de IA externa (armazenada de forma segura no backend).
+            *   Passar `baseImageUrl` e `prompt` (ajustado pelo `stylePreset` se aplicável).
+        6.  Chamar a API de IA externa.
+        7.  Tratar a resposta da API de IA:
+            *   Se sucesso: Obter a URL da imagem transformada. Incrementar `aiTransformationsToday` para o utilizador.
+            *   Se erro: Mapear para uma mensagem de erro apropriada.
+        8.  (Opcional) Considerar armazenar a imagem transformada temporariamente ou permanentemente, dependendo dos requisitos e custos. Para PoC, pode ser apenas a URL da API externa.
+    *   Response (Sucesso - 200 OK):
+        ```json
+        {
+          "transformedImageUrl": "String (URL da imagem gerada pela IA)",
+          "originalImageUrl": "String (URL da imagem base enviada)",
+          "promptUsed": "String (O prompt final enviado para a API de IA)",
+          "transformationsRemainingToday": "Number (Número de transformações ainda disponíveis para o utilizador hoje)"
+        }
+        ```
+    *   Response (Erro):
+        *   `401 Unauthorized`: Utilizador não autenticado.
+        *   `429 Too Many Requests`: Limite diário de transformações atingido pelo utilizador.
+            ```json
+            {
+              "error": "Limite diário de transformações atingido.",
+              "transformationsRemainingToday": 0
+            }
+            ```
+        *   `400 Bad Request`: Input inválido (ex: `baseImageUrl` ou `prompt` em falta/inválido).
+            ```json
+            {
+              "error": "Requisição inválida. Verifique os parâmetros 'baseImageUrl' e 'prompt'."
+            }
+            ```
+        *   `500 Internal Server Error`: Erro genérico do servidor.
+        *   `502 Bad Gateway` ou `503 Service Unavailable`: Erro na comunicação com a API de IA externa ou a API de IA externa está indisponível/retornou erro.
+            ```json
+            {
+              "error": "Ocorreu um erro ao processar a imagem com o serviço de IA. Tente novamente mais tarde."
+            }
+            ```
+
+Considerações Adicionais:
+*   **Chave da API de IA Externa:** Deve ser armazenada de forma segura no backend (ex: variáveis de ambiente, gestor de segredos) e nunca exposta no frontend.
+*   **Limites de Uso:** O limite diário por utilizador é uma medida de controlo de custos e abuso para a PoC.
+*   **Processamento Assíncrono:** Para transformações que podem demorar mais tempo, considerar um modelo assíncrono (endpoint inicia a tarefa, outro endpoint consulta o estado/resultado). Para a PoC, um processo síncrono com timeout pode ser suficiente se a API de IA for rápida. DeepAI costuma ser relativamente rápida para o Image Editor.
+*   **Tratamento de Erros da API Externa:** Mapear os erros da API de IA para mensagens compreensíveis para o utilizador final.

@@ -1,0 +1,26 @@
+Requisitos de Dados para Funcionalidade do Mapa Interativo
+
+A funcionalidade de mapa interativo na plataforma CaboVerdeProperties é crucial para permitir que os utilizadores visualizem a localização geográfica das propriedades. Para garantir o correto funcionamento desta funcionalidade, os seguintes requisitos de dados devem ser atendidos:
+
+1.  **Campo de Coordenadas GPS (`locationGpsCoordinates`):**
+    *   **Presença:** Para que uma propriedade seja exibida no mapa, o campo `locationGpsCoordinates` no modelo `Property` (definido em `models/property_model.txt`) DEVE ser preenchido.
+    *   **Formato:** As coordenadas devem ser fornecidas como uma string única no formato "latitude,longitude".
+        *   **Exemplo Válido:** `"14.9197,-23.5125"`
+        *   **Exemplos Inválidos:** `"14.9197 -23.5125"`, `"14°55'10.9\"N 23°30'45.0\"W"`, `"(14.9197, -23.5125)"`
+    *   **Precisão:** Recomenda-se o uso de pelo menos 4-6 casas decimais para uma localização precisa.
+    *   **Validação:** Idealmente, o sistema deve validar o formato das coordenadas no momento da entrada de dados (seja pelo painel de administração ou outra fonte).
+
+2.  **Fonte dos Dados:**
+    *   As coordenadas GPS podem ser obtidas através de:
+        *   Entrada manual pelo administrador ao registar/editar uma propriedade.
+        *   Utilização de uma ferramenta de geocodificação (converter endereço em coordenadas) integrada no painel de admin.
+        *   Importação de dados de fontes externas que já contenham coordenadas.
+
+3.  **Privacidade:**
+    *   Ao exibir propriedades no mapa público, considerar as implicações de privacidade de mostrar a localização exata. Pode ser necessário oferecer uma opção para mostrar uma localização aproximada (ex: centro do bairro/concelho) em certos casos, embora para a funcionalidade de mapa detalhado, a precisão seja geralmente preferida. Esta política deve ser definida.
+
+4.  **API para o Mapa (`GET /api/properties/map`):**
+    *   Este endpoint deve filtrar e retornar apenas propriedades que possuam `locationGpsCoordinates` válidas e preenchidas.
+    *   Os dados retornados devem incluir, no mínimo: ID, título, preço, coordenadas GPS, e uma imagem principal para exibição nas info-windows dos marcadores do mapa.
+
+Ao aderir a estes requisitos, a funcionalidade do mapa interativo será robusta e fornecerá valor significativo aos utilizadores da plataforma.

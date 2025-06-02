@@ -1,0 +1,32 @@
+Model: Property
+Fields:
+  id: UniqueID (Primary Key, Auto-generated)
+  ownerId: ForeignKey (References User.id, Optional, for internal tracking or if owners are users)
+  status: Enum('new', 'used', 'ruin', 'abandoned', 'pending_approval', 'active', 'sold', 'rejected', Default: 'pending_approval') (Required)
+  title: String (Required, Short description for the listing)
+  description: LongText (Required, Detailed description, potential, highlights)
+  propertyType: Enum('land', 'house', 'apartment', 'ruin', 'commercial_abandoned') (Required)
+  priceAmount: Decimal (Required)
+  priceCurrency: Enum('CVE', 'EUR', 'USD', Default: 'CVE') (Required)
+  sizeBuilt: Decimal (Optional, in m²)
+  sizeLand: Decimal (Optional, in m² or hectares)
+  bedrooms: Integer (Optional)
+  bathrooms: Integer (Optional)
+  galleryImages: Array[URLString] (Optional, Multiple images)
+  videoLink: URLString (Optional)
+  documentationAvailable: String (Optional, Description of available documents)
+  otherFeatures: Array[String] (Optional, Tags like 'sea_view', 'beach_access')
+  isFeatured: Boolean (Default: false, Optional)
+
+  locationIsland: Enum('Santo Antão', 'São Vicente', 'Santa Luzia', 'São Nicolau', 'Sal', 'Boa Vista', 'Maio', 'Santiago', 'Fogo', 'Brava') (Required)
+  locationMunicipality: String (Required)
+  locationNeighborhood: String (Optional)
+  locationAddressLine1: String (Optional)
+  locationGpsCoordinates: String (Optional, format: "latitude,longitude")
+  locationMapLink: URLString (Optional)
+
+  createdAt: Timestamp (Auto-generated)
+  updatedAt: Timestamp (Auto-generated)
+Relationships:
+  - BelongsTo: User (Admin who manages it, or Owner if applicable)
+  - HasMany: Interests

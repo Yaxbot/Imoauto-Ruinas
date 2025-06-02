@@ -1,0 +1,72 @@
+Descrições dos Componentes de UI para Autenticação e Perfil de Utilizador:
+
+1.  Página de Registo de Utilizador
+    *   URL: /register
+    *   Título: "Criar Nova Conta"
+    *   Campos do Formulário:
+        *   Nome Completo (input type="text", required)
+        *   Endereço de Email (input type="email", required)
+        *   Palavra-passe (input type="password", required, com requisitos de força se aplicável)
+        *   Confirmar Palavra-passe (input type="password", required, deve corresponder ao campo Palavra-passe)
+        *   Nacionalidade (input type="text", required)
+        *   Número de Telefone (input type="tel", required)
+        *   Número de WhatsApp (input type="tel", optional)
+    *   Botão de Ação: "Registar"
+        *   Ao Clicar: Valida os campos do formulário. Se válido, envia uma requisição `POST /api/users/register` com os dados.
+        *   Feedback: Exibe mensagens de sucesso (ex: "Registo efetuado com sucesso! Verifique seu email.") ou erro (ex: "Este email já está em uso.").
+    *   Links Adicionais: "Já tem uma conta? Faça login aqui." (link para a Página de Login).
+
+2.  Página de Login de Utilizador
+    *   URL: /login
+    *   Título: "Aceder à Sua Conta"
+    *   Campos do Formulário:
+        *   Endereço de Email (input type="email", required)
+        *   Palavra-passe (input type="password", required)
+    *   Opções Adicionais:
+        *   Checkbox "Lembrar-me" (opcional, para manter a sessão)
+        *   Link "Esqueceu-se da palavra-passe?" (leva para um fluxo de recuperação de palavra-passe, não detalhado aqui)
+    *   Botão de Ação: "Login"
+        *   Ao Clicar: Envia uma requisição `POST /api/users/login` com email e palavra-passe.
+        *   Feedback: Em caso de sucesso, redireciona para o dashboard ou página de perfil. Em caso de erro, exibe mensagens (ex: "Email ou palavra-passe incorretos.").
+    *   Links Adicionais: "Não tem uma conta? Registe-se aqui." (link para a Página de Registo).
+
+3.  Página de Perfil do Utilizador
+    *   URL: /profile/me (ou similar, acessível apenas para utilizadores logados)
+    *   Título: "Meu Perfil"
+    *   Secção de Visualização de Dados (não editável diretamente aqui):
+        *   Foto de Perfil (se existir)
+        *   Nome: [Nome do Utilizador]
+        *   Email: [Email do Utilizador]
+        *   Nacionalidade: [Nacionalidade do Utilizador]
+        *   Telefone: [Telefone do Utilizador]
+        *   WhatsApp: [WhatsApp do Utilizador] (se existir)
+        *   Role: [Role do Utilizador] (ex: Comum, Administrador)
+    *   Secção de Edição de Perfil:
+        *   Formulário com Título: "Editar Informações do Perfil"
+        *   Campo para Upload de Nova Foto de Perfil: (input type="file", opcional)
+            *   Nota: O upload real da imagem geralmente envolve um endpoint específico (ex: `POST /api/users/me/avatar`) e lógica de tratamento de arquivos no backend. A URL da imagem atualizada seria então usada no `PUT /api/users/me`.
+        *   Nome Completo (input type="text", valor atual preenchido, opcionalmente editável)
+        *   Nacionalidade (input type="text", valor atual preenchido, opcionalmente editável)
+        *   Número de Telefone (input type="tel", valor atual preenchido, opcionalmente editável)
+        *   Número de WhatsApp (input type="tel", valor atual preenchido, opcionalmente editável)
+        *   Botão de Ação: "Guardar Alterações"
+            *   Ao Clicar: Valida os campos. Envia uma requisição `PUT /api/users/me` com os dados que foram alterados. O `profilePictureUrl` seria preenchido com a URL da nova imagem se uma foi carregada.
+            *   Feedback: Exibe mensagens de sucesso ou erro.
+    *   (Opcional) Secção para Alterar Palavra-passe:
+        *   Formulário com Título: "Alterar Palavra-passe"
+        *   Palavra-passe Atual (input type="password", required)
+        *   Nova Palavra-passe (input type="password", required)
+        *   Confirmar Nova Palavra-passe (input type="password", required)
+        *   Botão de Ação: "Alterar Palavra-passe"
+            *   Ao Clicar: Valida os campos. Envia uma requisição para um endpoint específico (ex: `PUT /api/users/me/password`).
+            *   Feedback: Exibe mensagens de sucesso ou erro.
+    *   Botão de Logout:
+        *   Texto: "Logout"
+        *   Ao Clicar: Envia uma requisição `POST /api/users/logout`. Redireciona para a página de login.
+
+Considerações de Design para Autenticação:
+*   **Responsividade:** Aplicar os princípios de `design/responsiveness_guidelines.txt`.
+    *   **Exemplo para Formulários (Registo, Login, Perfil):** Em telas <576px (mobile), todos os campos de formulário (inputs, selects) devem ocupar 100% da largura do contentor do formulário. Labels devem ser posicionadas acima dos seus respectivos campos. Botões de ação também devem ter largura total ou largura suficiente para serem facilmente tocáveis.
+    *   **Exemplo para Página de Perfil:** Se houver múltiplas secções (ex: Dados Pessoais, Alterar Senha), estas podem ser apresentadas como secções empilhadas verticalmente ou usar um sistema de abas que seja mobile-friendly.
+*   **Simplicidade e Clareza:** Formulários de autenticação devem ser o mais simples e diretos possível.
+*   **Feedback ao Utilizador:** Fornecer feedback claro para erros de validação, sucesso no login/registo, etc.

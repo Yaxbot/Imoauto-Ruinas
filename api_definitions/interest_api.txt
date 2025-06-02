@@ -1,0 +1,51 @@
+Endpoints da API para Manifestação de Interesse em Propriedades:
+
+1.  POST /api/properties/{propertyId}/interests
+    *   Descrição: Regista o interesse de um utilizador autenticado numa propriedade específica.
+    *   Proteção: Requer autenticação de utilizador (papel 'common' ou 'admin'). Utilizadores não logados devem ser impedidos ou direcionados para login/registo.
+    *   Path Parameter:
+        *   `propertyId`: UniqueID da propriedade pela qual o utilizador está a manifestar interesse.
+    *   Request Body (Opcional):
+        ```json
+        {
+          "message": "String, Optional (Mensagem curta do utilizador a acompanhar o interesse)"
+        }
+        ```
+        Se o corpo da requisição estiver vazio, o interesse é registado sem mensagem.
+    *   Lógica de Negócio:
+        1.  Verificar se o utilizador (`userId` extraído do token de autenticação) já manifestou interesse anteriormente nesta mesma `propertyId`.
+            *   Se já existe um interesse ativo (ex: não cancelado), pode retornar uma mensagem indicando isso (ex: "Já demonstrou interesse nesta propriedade.") ou simplesmente atualizar o `updatedAt` do interesse existente e adicionar a nova mensagem (se houver). A política exata (permitir múltiplos interesses ou apenas um ativo) deve ser definida. Para a Fase 1, vamos assumir que um novo interesse pode ser adicionado ou o existente atualizado com uma nova mensagem/timestamp.
+        2.  Criar um novo registo na tabela `Interests` com:
+            *   `userId`: ID do utilizador logado.
+            *   `propertyId`: ID da propriedade da URL.
+            *   `message`: Conteúdo da mensagem do Request Body (se fornecida).
+            *   `createdAt`, `updatedAt`: Timestamps gerados automaticamente.
+        3.  (Pós-criação) Disparar mecanismos de notificação para o administrador (ex: email, notificação no painel).
+    *   Response (Sucesso - 201 Created):
+        *   Retorna o objeto `Interest` completo que foi criado.
+        ```json
+        {
+          "id": "UniqueID (do interesse)",
+          "userId": "UniqueID (do utilizador)",
+          "propertyId": "UniqueID (da propriedade)",
+          "message": "String, Optional (a mensagem que foi guardada)",
+          "createdAt": "Timestamp"
+        }
+        ```
+        Ou, alternativamente, uma mensagem de sucesso simples:
+        ```json
+        {
+          "message": "Interesse registado com sucesso."
+        }
+        ```
+    *   Response (Erro):
+        *   `401 Unauthorized`: Se o utilizador não estiver logado.
+        *   `403 Forbidden`: Se um utilizador tentar agir em nome de outro (embora o `userId` deva vir do token).
+        *   `404 Not Found`: Se a `propertyId` não corresponder a uma propriedade existente e ativa.
+        *   `400 Bad Request`: Se houver um problema com a `message` (ex: demasiado longa, se houver validação).
+        *   `409 Conflict`: Se a política for de não permitir novo interesse se um já existir e não for para atualizar.
+        *   `500 Internal Server Error`: Para outros erros do servidor.
+
+Considerações Adicionais:
+*   O modelo `Interest` associado está definido em `models/interest_model.txt`.
+*   A notificação ao administrador é um efeito colateral desta operação e está detalhada em `admin_features/interest_notifications.txt`.

@@ -1,0 +1,76 @@
+Endpoints da API para Gestão de Artigos (Painel de Administração):
+
+1.  GET /api/admin/articles
+    *   Descrição: Lista todos os artigos para gestão no painel de administração.
+    *   Proteção: Apenas Administradores ou Utilizadores com papel 'editor'.
+    *   Query Parameters:
+        *   `page`: Número da página (Default: 1).
+        *   `limit`: Número de itens por página (Default: 10).
+        *   `status_filter`: Filtra artigos pelo estado ('draft', 'published', 'archived').
+        *   `category_filter`: Filtra artigos por categoria.
+        *   `author_filter`: Filtra artigos por ID do autor.
+        *   `q`: Termo de pesquisa (para título, excerto).
+        *   `sort_by`: Campo para ordenação (ex: `createdAt`, `updatedAt`, `publishedAt`, `title`. Default: `createdAt`).
+        *   `sort_order`: Ordem de ordenação ('asc' ou 'desc'. Default: 'desc').
+    *   Response (Sucesso):
+        {
+          "pagination": { /* ... */ },
+          "data": [ // Array de objetos Article (podem ser versões resumidas)
+            {
+              "id": "UniqueID",
+              "title": "String",
+              "slug": "String",
+              "status": "Enum",
+              "category": "String, Optional",
+              "author": { "id": "UserID", "name": "String" }, // Informação resumida do autor
+              "createdAt": "Timestamp",
+              "updatedAt": "Timestamp",
+              "publishedAt": "Timestamp, Optional"
+            }
+          ]
+        }
+
+2.  POST /api/admin/articles
+    *   Descrição: Cria um novo artigo.
+    *   Proteção: Apenas Administradores ou Utilizadores com papel 'editor'.
+    *   Request Body: Objeto Article completo (conforme `models/article_model.txt`).
+        *   `title` (Required)
+        *   `content` (Required)
+        *   `excerpt` (Optional)
+        *   `featuredImageUrl` (Optional)
+        *   `status` (Optional, Default: 'draft')
+        *   `category` (Optional)
+        *   `tags` (Optional, Array[String])
+        *   `publishedAt` (Optional, para agendamento)
+        *   `authorId` será inferido do utilizador autenticado ou explicitamente definido se o admin estiver a criar por outro.
+    *   Lógica Adicional: Geração automática do `slug` a partir do `title`.
+    *   Response (Sucesso - 201 Created): Objeto do artigo criado (completo).
+
+3.  GET /api/admin/articles/{articleId}
+    *   Descrição: Obtém os detalhes completos de um artigo específico para edição.
+    *   Proteção: Apenas Administradores ou Utilizadores com papel 'editor'.
+    *   Path Parameter: `articleId` (UniqueID do artigo).
+    *   Response (Sucesso): Objeto Article completo.
+    *   Response (Erro - 404 Not Found): Se o artigo não existir.
+
+4.  PUT /api/admin/articles/{articleId}
+    *   Descrição: Atualiza um artigo existente.
+    *   Proteção: Apenas Administradores ou Utilizadores com papel 'editor'.
+    *   Path Parameter: `articleId` (UniqueID do artigo).
+    *   Request Body: Objeto Article com os campos a serem atualizados.
+        *   Se o `title` for alterado, o `slug` pode precisar ser regenerado (com cuidado para não quebrar links existentes, ou manter o slug original).
+    *   Response (Sucesso): Objeto do artigo atualizado (completo).
+    *   Response (Erro - 404 Not Found): Se o artigo não existir.
+
+5.  DELETE /api/admin/articles/{articleId}
+    *   Descrição: Elimina um artigo. (Pode ser um soft delete, mudando o status para 'archived' ou 'deleted', ou um hard delete).
+    *   Proteção: Apenas Administradores ou Utilizadores com papel 'editor'.
+    *   Path Parameter: `articleId` (UniqueID do artigo).
+    *   Response (Sucesso - 200 OK ou 204 No Content): Mensagem de sucesso ou sem conteúdo.
+    *   Response (Erro - 404 Not Found): Se o artigo não existir.
+
+Considerações:
+*   **Papel 'editor':** Se este papel for formalizado, deve ser adicionado ao modelo `User` e verificado nas políticas de acesso.
+*   **Upload de Imagem:** O `featuredImageUrl` implica que as imagens são carregadas para algum lugar e a URL é fornecida. Um endpoint como `POST /api/files/upload` (definido anteriormente) seria usado para isso.
+*   **Geração de Slug:** A lógica para gerar slugs únicos e amigáveis (ex: a partir do título) deve ser implementada no backend.
+*   **Agendamento (`publishedAt`):** Se `publishedAt` for uma data futura e `status` for 'published', o artigo só deve aparecer publicamente após essa data. Isso requer lógica de query nos endpoints públicos.

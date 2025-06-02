@@ -1,0 +1,85 @@
+Endpoints da API para Autenticação e Gestão de Utilizadores:
+
+1.  POST /api/users/register
+    *   Descrição: Regista um novo utilizador.
+    *   Request Body:
+        {
+          "name": "String, Required",
+          "email": "String, Required, Unique, Valid Email Format",
+          "password": "String, Required",
+          "nationality": "String, Required",
+          "phone": "String, Required",
+          "whatsapp": "String, Optional"
+        }
+    *   Response (Sucesso):
+        {
+          "userId": "UniqueID",
+          "email": "String",
+          "name": "String"
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Email já existe", "Campos em falta").
+
+2.  POST /api/users/login
+    *   Descrição: Autentica um utilizador existente.
+    *   Request Body:
+        {
+          "email": "String, Required",
+          "password": "String, Required"
+        }
+    *   Response (Sucesso):
+        {
+          "token": "String (JWT ou similar)",
+          "userId": "UniqueID",
+          "email": "String",
+          "name": "String",
+          "role": "Enum('common', 'admin')"
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Credenciais inválidas").
+
+3.  GET /api/users/me
+    *   Descrição: Obtém os detalhes do utilizador atualmente logado.
+    *   Autenticação: Requerida (ex: via token no header Authorization).
+    *   Response (Sucesso):
+        {
+          "userId": "UniqueID",
+          "email": "String",
+          "name": "String",
+          "nationality": "String",
+          "phone": "String",
+          "whatsapp": "String, Optional",
+          "profilePicture": "URLString, Optional",
+          "role": "Enum('common', 'admin')"
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Não autorizado").
+
+4.  PUT /api/users/me
+    *   Descrição: Atualiza o perfil do utilizador atualmente logado.
+    *   Autenticação: Requerida.
+    *   Request Body:
+        {
+          "name": "String, Optional",
+          "nationality": "String, Optional",
+          "phone": "String, Optional",
+          "whatsapp": "String, Optional",
+          "profilePictureUrl": "URLString, Optional"
+        }
+    *   Response (Sucesso):
+        {
+          "userId": "UniqueID",
+          "email": "String",
+          "name": "String",
+          "nationality": "String",
+          "phone": "String",
+          "whatsapp": "String, Optional",
+          "profilePicture": "URLString, Optional"
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Não autorizado", "Erro de validação").
+
+5.  POST /api/users/logout
+    *   Descrição: Invalida a sessão/token do utilizador logado.
+    *   Autenticação: Requerida.
+    *   Response (Sucesso):
+        {
+          "message": "Logout bem-sucedido."
+        }
+    *   Response (Erro): Mensagem de erro.

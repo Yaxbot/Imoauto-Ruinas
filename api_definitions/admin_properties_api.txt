@@ -1,0 +1,97 @@
+Endpoints da API para Gestão de Propriedades (Painel de Administração):
+
+1.  GET /api/admin/properties
+    *   Descrição: Lista todas as propriedades registadas no sistema, com filtros e paginação. Destinado a administradores.
+    *   Proteção: Apenas Administradores.
+    *   Query Parameters:
+        *   `page`: Número da página (ex: 1, 2, ... Default: 1).
+        *   `limit`: Número de itens por página (ex: 10, 20, ... Default: 10).
+        *   `status_filter`: Filtra propriedades pelo estado (ex: 'pending_approval', 'active', 'sold', 'rejected'). Opcional.
+        *   `island_filter`: Filtra propriedades pela ilha. Opcional.
+        *   `municipality_filter`: Filtra propriedades pelo concelho. Opcional.
+        *   `property_type_filter`: Filtra propriedades pelo tipo. Opcional.
+        *   `sort_by`: Campo para ordenação (ex: 'createdAt', 'priceAmount', 'title'. Default: 'createdAt').
+        *   `sort_order`: Ordem de ordenação ('asc' ou 'desc'. Default: 'desc').
+    *   Response (Sucesso):
+        {
+          "pagination": {
+            "currentPage": "Number",
+            "totalPages": "Number",
+            "totalItems": "Number",
+            "itemsPerPage": "Number"
+          },
+          "data": [ // Array de objetos Property (versão resumida)
+            {
+              "id": "UniqueID",
+              "title": "String",
+              "status": "Enum",
+              "propertyType": "Enum",
+              "priceAmount": "Decimal",
+              "priceCurrency": "Enum",
+              "locationIsland": "Enum",
+              "locationMunicipality": "String",
+              "createdAt": "Timestamp",
+              "isFeatured": "Boolean"
+              // Incluir outros campos relevantes para a listagem
+            }
+            // ... mais propriedades
+          ]
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Não autorizado", "Parâmetros inválidos").
+
+2.  POST /api/admin/properties
+    *   Descrição: Cria uma nova propriedade no sistema.
+    *   Proteção: Apenas Administradores.
+    *   Request Body: Objeto Property completo (conforme definido em `models/property_model.txt`).
+        *   Nota: `galleryImages` deve ser um array de URLs. O upload dos arquivos de imagem deve ser tratado separadamente (ex: pelo endpoint `/api/files/upload`) antes desta chamada, e as URLs resultantes incluídas aqui.
+    *   Response (Sucesso): Objeto da propriedade criada (completo).
+    *   Response (Erro): Mensagem de erro (ex: "Não autorizado", "Dados inválidos", "Erro ao criar propriedade").
+
+3.  GET /api/admin/properties/{propertyId}
+    *   Descrição: Obtém os detalhes completos de uma propriedade específica para visualização ou edição pelo administrador.
+    *   Proteção: Apenas Administradores.
+    *   Path Parameter: `propertyId` (UniqueID da propriedade).
+    *   Response (Sucesso): Objeto Property completo.
+    *   Response (Erro): Mensagem de erro (ex: "Não autorizado", "Propriedade não encontrada").
+
+4.  PUT /api/admin/properties/{propertyId}
+    *   Descrição: Atualiza os detalhes de uma propriedade existente.
+    *   Proteção: Apenas Administradores.
+    *   Path Parameter: `propertyId` (UniqueID da propriedade).
+    *   Request Body: Objeto Property contendo apenas os campos a serem atualizados.
+        *   Nota: Se `galleryImages` for atualizado, deve ser um array completo das URLs de imagens.
+    *   Response (Sucesso): Objeto da propriedade atualizada (completo).
+    *   Response (Erro): Mensagem de erro (ex: "Não autorizado", "Propriedade não encontrada", "Erro ao atualizar").
+
+5.  DELETE /api/admin/properties/{propertyId}
+    *   Descrição: Elimina uma propriedade do sistema.
+    *   Proteção: Apenas Administradores.
+    *   Path Parameter: `propertyId` (UniqueID da propriedade).
+    *   Response (Sucesso):
+        {
+          "message": "Propriedade eliminada com sucesso."
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Não autorizado", "Propriedade não encontrada", "Erro ao eliminar").
+
+---
+Endpoint Opcional (Recomendado) para Upload de Arquivos:
+
+POST /api/files/upload
+    *   Descrição: Realiza o upload de um arquivo (ex: imagem para galeria de propriedade, foto de perfil).
+    *   Proteção: Utilizadores logados (para submissão/foto de perfil) e Administradores (para imagens de propriedades). A lógica de autorização específica pode depender do contexto do upload (ex: quem está a fazer upload e para quê).
+    *   Request: `FormData` contendo o arquivo.
+        *   Ex: `multipart/form-data` com um campo como `file` ou `image`.
+    *   Headers: Pode incluir `Content-Type: multipart/form-data`.
+    *   Response (Sucesso):
+        {
+          "fileUrl": "String (URL do arquivo no servidor ou CDN)",
+          "fileName": "String (Nome do arquivo)",
+          "fileType": "String (MIME type do arquivo)",
+          "fileSize": "Number (Tamanho em bytes)"
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Nenhum arquivo enviado", "Tipo de arquivo não suportado", "Tamanho do arquivo excede o limite", "Erro no upload").
+    *   Considerações:
+        *   O backend deve validar o tipo de arquivo, tamanho máximo.
+        *   Armazenar o arquivo em um local seguro (servidor local, S3, etc.).
+        *   Gerar uma URL única para acesso ao arquivo.
+        *   Pode incluir otimização de imagem para uploads de imagens.

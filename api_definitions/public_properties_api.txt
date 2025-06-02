@@ -1,0 +1,134 @@
+Endpoints da API Pública para Visualização de Propriedades:
+
+1.  GET /api/properties
+    *   Descrição: Lista todas as propriedades que estão com o estado 'active' (aprovadas e visíveis publicamente).
+    *   Acesso: Público.
+    *   Query Parameters:
+        *   `q`: Termo de pesquisa textual (String). Pesquisa em campos como título, descrição, localização (ilha, concelho, bairro), ID da propriedade.
+        *   `page`: Número da página (ex: 1, 2, ... Default: 1).
+        *   `limit`: Número de itens por página (ex: 9, 12, ... Default: 9 ou 12).
+        *   `sort_by`: Critério de ordenação.
+            *   Exemplos: `price_asc`, `price_desc`, `date_added_desc`, `date_added_asc`, `size_built_desc`, `size_land_desc`, `relevance` (se `q` estiver presente).
+            *   Default: `date_added_desc` (ou `relevance` se `q` for usado).
+        *   `island`: Filtra por ilha (String, ex: "Santiago"). Pode aceitar múltiplos valores separados por vírgula (ex: "Santiago,Sal").
+        *   `municipality`: Filtra por concelho (String, ex: "Praia"). Pode aceitar múltiplos valores separados por vírgula.
+        *   `propertyType`: Filtra por tipo de propriedade (String, ex: "house"). Pode aceitar múltiplos valores Enum separados por vírgula (ex: "house,apartment,land").
+        *   `priceMin`: Preço mínimo (Number).
+        *   `priceMax`: Preço máximo (Number).
+        *   `sizeBuiltMin`: Área construída mínima em m² (Number).
+        *   `sizeBuiltMax`: Área construída máxima em m² (Number).
+        *   `sizeLandMin`: Área de terreno mínima em m² (Number).
+        *   `sizeLandMax`: Área de terreno máxima em m² (Number).
+        *   `bedroomsMin`: Número mínimo de quartos (Integer).
+        *   `bedroomsMax`: Número máximo de quartos (Integer, opcional).
+        *   `bathroomsMin`: Número mínimo de casas de banho (Integer).
+        *   `bathroomsMax`: Número máximo de casas de banho (Integer, opcional).
+        *   `otherFeatures`: Filtra por características/palavras-chave (String, separada por vírgulas, ex: "vista_mar,piscina,para_renovar"). Corresponde ao campo `otherFeatures` do modelo.
+        *   `isFeatured`: Filtra por propriedades em destaque (Boolean, ex: `true`).
+        *   `status`: (Manter foco em 'active' para este endpoint público, mas pode ser útil para filtros de sub-status se existirem, ex: 'novo_lancamento').
+    *   Response (Sucesso):
+        {
+          "pagination": {
+            "currentPage": "Number",
+            "totalPages": "Number",
+            "totalItems": "Number",
+            "itemsPerPage": "Number"
+          },
+          "data": [ // Array de objetos Property (versão otimizada para listagem pública)
+            {
+              "id": "UniqueID",
+              "slug": "String (URL amigável, ex: 'moradia-t3-praia-cidadevelha')",
+              "title": "String",
+              "status": "Enum (deve ser 'active')",
+              "propertyType": "Enum",
+              "priceAmount": "Decimal",
+              "priceCurrency": "Enum",
+              "sizeBuilt": "Decimal, Optional",
+              "sizeLand": "Decimal, Optional",
+              "bedrooms": "Integer, Optional",
+              "bathrooms": "Integer, Optional",
+              "mainImageUrl": "URLString (URL da imagem principal/thumbnail)", // Otimizado para listagem
+              "galleryImagesCount": "Integer (Número total de imagens na galeria)",
+              "locationIsland": "Enum",
+              "locationMunicipality": "String",
+              "locationNeighborhood": "String, Optional",
+              "locationGpsCoordinates": "String, Optional (essencial para o mapa)",
+              "isFeatured": "Boolean",
+              "createdAt": "Timestamp (para ordenação por data)"
+            }
+            // ... mais propriedades
+          ]
+        }
+    *   Response (Erro): Mensagem de erro (ex: "Parâmetros inválidos").
+
+2.  GET /api/properties/map
+    *   Descrição: Retorna uma lista de propriedades ativas com dados otimizados para exibição em um mapa interativo. Apenas propriedades com coordenadas GPS válidas são retornadas.
+    *   Acesso: Público.
+    *   Query Parameters: Todos os parâmetros de filtro aplicáveis de `GET /api/properties` (q, island, municipality, propertyType, priceMin, priceMax, etc.) para que o mapa reflita os filtros da listagem. Não inclui `page`, `limit`, `sort_by` pois o mapa geralmente mostra todos os resultados filtrados.
+    *   Response (Sucesso):
+        {
+          "data": [ // Array de objetos Property otimizados para mapa
+            {
+              "id": "UniqueID",
+              "slug": "String",
+              "title": "String (curto)",
+              "priceAmount": "Decimal",
+              "priceCurrency": "Enum",
+              "mainImageUrl": "URLString (thumbnail)",
+              "locationGpsCoordinates": "String (formato: 'latitude,longitude', Obrigatório)",
+              "propertyType": "Enum",
+              "bedrooms": "Integer, Optional",
+              "bathrooms": "Integer, Optional"
+            }
+            // ... mais propriedades com coordenadas válidas
+          ]
+        }
+    *   Response (Erro): Mensagem de erro.
+
+3.  GET /api/properties/{propertyIdOrSlug}
+    *   Descrição: Obtém os detalhes completos de uma propriedade específica que está 'active'.
+    *   Acesso: Público.
+    *   Path Parameter: `propertyIdOrSlug` (Pode ser o UniqueID da propriedade ou um 'slug' gerado para URL amigável).
+    *   Response (Sucesso): Objeto Property completo, contendo todos os campos relevantes para exibição pública (conforme `models/property_model.txt`, mas apenas os campos que devem ser públicos).
+        *   Excluir campos como `ownerId` (a menos que seja público), `internalNotes`, etc.
+        *   Incluir `galleryImages` (array completo de URLs), `videoLink`, etc.
+        *   Exemplo de campos a incluir:
+            ```json
+            {
+              "id": "UniqueID",
+              "slug": "String",
+              "title": "String",
+              "description": "LongText",
+              "status": "Enum ('active')",
+              "propertyType": "Enum",
+              "priceAmount": "Decimal",
+              "priceCurrency": "Enum",
+              "sizeBuilt": "Decimal, Optional",
+              "sizeLand": "Decimal, Optional",
+              "bedrooms": "Integer, Optional",
+              "bathrooms": "Integer, Optional",
+              "galleryImages": ["URLString1", "URLString2", ...],
+              "videoLink": "URLString, Optional",
+              "documentationAvailable": "String, Optional",
+              "otherFeatures": ["StringTag1", "StringTag2", ...],
+              "isFeatured": "Boolean",
+              "locationIsland": "Enum",
+              "locationMunicipality": "String",
+              "locationNeighborhood": "String, Optional",
+              "locationAddressLine1": "String, Optional",
+              "locationGpsCoordinates": "String, Optional (formato: 'latitude,longitude')",
+              "locationMapLink": "URLString, Optional",
+              "createdAt": "Timestamp",
+              "updatedAt": "Timestamp"
+              // Não incluir ownerId, histórico de status interno, etc.
+            }
+            ```
+    *   Response (Erro):
+        *   `404 Not Found`: Se a propriedade não existir, não estiver 'active', ou o slug/ID for inválido.
+        *   Mensagem de erro.
+
+Considerações Adicionais para API Pública:
+*   **Slugs:** Implementar a geração de slugs únicos e amigáveis para SEO a partir do título da propriedade e localização.
+*   **Performance:** Otimizar queries para listagem e detalhes. Considerar caching para endpoints públicos.
+*   **Segurança:** Garantir que apenas propriedades com status 'active' (ou similarmente aprovado/público) sejam retornadas. Filtrar quaisquer campos internos que não devam ser expostos publicamente.
+*   **Rate Limiting:** Implementar rate limiting para proteger contra abuso.

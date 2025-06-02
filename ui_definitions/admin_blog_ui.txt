@@ -1,0 +1,78 @@
+Componentes de UI para Gestão de Blog/Notícias (Painel de Administração):
+
+**1. Painel de Administração - Secção Blog/Artigos**
+
+*   **Navegação:** Link "Blog" ou "Artigos" no menu principal do painel de administração.
+*   **Página Principal da Secção (/admin/articles):**
+    *   Título: "Gestão de Artigos".
+    *   Botão Principal: "Criar Novo Artigo" (leva ao formulário de criação).
+    *   **Filtros e Pesquisa:**
+        *   Campo de Pesquisa por texto (título, excerto).
+        *   Dropdown para filtrar por Estado (Todos, Publicado, Rascunho, Arquivado).
+        *   Dropdown para filtrar por Categoria.
+        *   (Opcional) Dropdown para filtrar por Autor.
+        *   Botão "Aplicar Filtros".
+    *   **Tabela de Listagem de Artigos:**
+        *   Colunas:
+            *   Checkbox (para ações em massa - futuro).
+            *   Título (link para editar o artigo).
+            *   Autor.
+            *   Categoria.
+            *   Tags (exibição concisa).
+            *   Estado (com indicador visual, ex: cor).
+            *   Data de Publicação (`publishedAt`).
+            *   Data de Criação (`createdAt`).
+            *   Ações.
+        *   Ações por Linha (Botões ou Dropdown):
+            *   Editar (leva ao formulário de edição).
+            *   Eliminar (com diálogo de confirmação).
+            *   Pré-visualizar (abre o artigo público numa nova aba, se publicado).
+            *   (Opcional) Duplicar Artigo.
+    *   **Paginação.**
+
+**2. Formulário de Criar/Editar Artigo (/admin/articles/new ou /admin/articles/edit/{articleId})**
+
+*   **Título da Página:** "Criar Novo Artigo" ou "Editar Artigo: [Título do Artigo]".
+*   **Layout:** Pode ser de coluna única ou duas colunas (principal para conteúdo, lateral para metadados).
+*   **Campos do Formulário:**
+    *   **Título do Artigo (`title`):** Input de texto (required).
+    *   **Slug (`slug`):**
+        *   Exibido como texto não editável (ou editável com aviso sobre impacto em SEO).
+        *   Gerado automaticamente a partir do título no backend.
+        *   Pode ter um botão "Editar Slug" para casos específicos.
+    *   **Conteúdo Principal (`content`):**
+        *   Editor WYSIWYG (What You See Is What You Get) - ex: TinyMCE, CKEditor, TipTap.
+        *   OU Editor Markdown com pré-visualização.
+        *   OU Editor baseado em blocos (ex: Editor.js).
+        *   Deve permitir formatação de texto, inserção de imagens (com upload para `POST /api/files/upload`), vídeos embutidos, listas, links, etc.
+    *   **Excerto (`excerpt`):** Textarea (opcional, para resumo manual). Se vazio, pode ser gerado automaticamente a partir do conteúdo.
+    *   **Imagem de Destaque (`featuredImageUrl`):**
+        *   Campo de upload de imagem (que usa `POST /api/files/upload` e armazena a URL retornada).
+        *   Pré-visualização da imagem carregada.
+        *   Botão para remover/alterar imagem.
+    *   **Estado (`status`):** Dropdown (Rascunho, Publicado, Arquivado).
+    *   **Data de Publicação (`publishedAt`):**
+        *   Campo de data e hora (datepicker).
+        *   Permite agendar a publicação se `status` for 'Publicado' e a data for futura.
+        *   Se o `status` for 'Rascunho', esta data pode ser a data de publicação pretendida.
+    *   **Categoria (`category`):**
+        *   Dropdown com categorias existentes.
+        *   (Opcional) Opção para adicionar nova categoria diretamente (requer endpoint de API para categorias).
+    *   **Tags (`tags`):**
+        *   Input de tags (ex: com autocompletar de tags existentes, permitir adicionar novas).
+        *   As tags podem ser exibidas como pequenos "chips" abaixo do campo.
+    *   **Autor (`authorId`):**
+        *   Normalmente preenchido automaticamente com o utilizador logado.
+        *   Se o admin puder postar em nome de outros, pode ser um dropdown de utilizadores com permissão.
+*   **Painel de Ações (geralmente na lateral ou no topo/rodapé):**
+    *   Botão "Guardar Rascunho".
+    *   Botão "Publicar" (ou "Agendar Publicação" se `publishedAt` for futuro).
+    *   Botão "Atualizar" (se editando).
+    *   (Opcional) Botão "Pré-visualizar".
+    *   (Opcional, se editando um artigo publicado) Botão "Reverter para Rascunho".
+*   **Feedback:** Mensagens de sucesso ou erro após submissão.
+
+**Considerações Adicionais para Admin UI:**
+*   **Gestão de Categorias e Tags:** Poderá ser necessária uma interface separada para administradores gerirem categorias e tags (criar, editar, eliminar), embora para a Fase 1, possam ser criadas "on-the-fly" através do formulário do artigo.
+*   **Editor de Conteúdo:** A escolha do editor de conteúdo é crucial para a experiência do autor. Deve ser robusto e fácil de usar.
+*   **Permissões:** Se houver diferentes papéis (Admin vs. Editor), a UI deve adaptar-se para mostrar apenas as ações permitidas.
