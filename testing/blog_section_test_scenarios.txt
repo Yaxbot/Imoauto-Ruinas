@@ -1,0 +1,125 @@
+Cenários de Teste - Secção de Blog/Notícias
+
+**Módulo 9: Gestão de Artigos (Painel de Administração)**
+
+*   **Pré-condição Global para Módulo 9:** Utilizador "admin_blog@example.com" com `role='admin'` (ou 'editor') está logado.
+
+*   **Cenário 9.1: Criar Artigo - Rascunho**
+    *   **Passos:**
+        1.  Admin navega para a secção de Blog/Artigos no painel de admin.
+        2.  Clica em "Criar Novo Artigo".
+        3.  Preenche o campo "Título" (ex: "Dicas para Comprar Imóvel em Cabo Verde - Rascunho").
+        4.  Preenche o campo "Conteúdo" com algum texto de exemplo usando o editor WYSIWYG/Markdown.
+        5.  (Opcional) Preenche "Excerto".
+        6.  (Opcional) Faz upload de uma "Imagem de Destaque" (simular que a URL é gerada e associada).
+        7.  (Opcional) Adiciona "Tags" (ex: "imobiliário", "dicas") e seleciona uma "Categoria" (ex: "Guias de Compra").
+        8.  Verifica se o "Status" está definido como "Rascunho" (ou seleciona-o).
+        9.  Clica em "Guardar Rascunho" ou "Guardar".
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/admin/articles` é enviado com os dados do artigo, incluindo `status='draft'`.
+        2.  API retorna sucesso (201 Created).
+        3.  Um novo artigo é criado na base de dados com os dados fornecidos, `status='draft'`, `authorId` associado ao admin logado, e um `slug` gerado a partir do título.
+        4.  O admin é redirecionado para a lista de artigos ou vê uma mensagem de sucesso.
+        5.  O novo artigo ("Dicas para Comprar Imóvel em Cabo Verde - Rascunho") aparece na lista de artigos no painel de admin, marcado como "Rascunho".
+
+*   **Cenário 9.2: Criar Artigo e Publicar Imediatamente**
+    *   **Passos:**
+        1.  Admin segue os passos 1-7 do Cenário 9.1, mas com um título diferente (ex: "Mercado Imobiliário em Sal 2024 - Publicado").
+        2.  Define o "Status" como "Publicado".
+        3.  (Opcional) Define "Data de Publicação" (`publishedAt`) para a data/hora atual ou uma data passada. Se não definido, o backend deve assumir a data atual ao publicar.
+        4.  Clica em "Publicar" ou "Guardar".
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/admin/articles` é enviado com `status='published'`.
+        2.  API retorna sucesso (201 Created).
+        3.  Artigo é criado com `status='published'` e `publishedAt` definido (ou atualizado para o momento da publicação).
+        4.  O artigo aparece na lista de admin como "Publicado".
+
+*   **Cenário 9.3: Editar Artigo (ex: de Rascunho para Publicado)**
+    *   **Pré-condições:** O artigo "Dicas para Comprar Imóvel em Cabo Verde - Rascunho" (do Cenário 9.1) existe com `status='draft'`.
+    *   **Passos:**
+        1.  Admin localiza o artigo "Dicas para Comprar Imóvel em Cabo Verde - Rascunho" na lista e clica em "Editar".
+        2.  O formulário de edição é carregado com os dados do artigo.
+        3.  Admin altera o "Título" para "Guia Completo para Comprar Imóvel em Cabo Verde".
+        4.  Admin altera o "Status" para "Publicado".
+        5.  (Opcional) Atualiza a "Data de Publicação" para agora.
+        6.  Clica em "Atualizar" ou "Publicar".
+    *   **Comportamento Esperado:**
+        1.  Pedido `PUT /api/admin/articles/{articleId}` é enviado com os dados atualizados.
+        2.  API retorna sucesso (200 OK).
+        3.  O artigo é atualizado na base de dados: título alterado, `status='published'`, `publishedAt` atualizado.
+        4.  O `slug` PODE ser atualizado para refletir o novo título (se a política de slug for de atualização automática e não houver preocupação com quebra de links antigos) ou permanecer o mesmo. Para esta simulação, vamos assumir que o slug é atualizado se o título mudar E o artigo ainda não tiver sido publicamente acessado extensivamente.
+        5.  O artigo aparece na lista de admin com o novo título e status "Publicado".
+
+*   **Cenário 9.4: Eliminar Artigo**
+    *   **Pré-condições:** Um artigo (ex: "Artigo para Eliminar") existe.
+    *   **Passos:**
+        1.  Admin localiza "Artigo para Eliminar" na lista.
+        2.  Clica no botão "Eliminar".
+        3.  Um diálogo de confirmação aparece. Admin confirma.
+    *   **Comportamento Esperado:**
+        1.  Pedido `DELETE /api/admin/articles/{articleId}` é enviado.
+        2.  API retorna sucesso (200 OK ou 204 No Content).
+        3.  O artigo é removido da base de dados (ou marcado como 'archived'/'deleted' dependendo da estratégia de soft delete, mas a API sugere um DELETE).
+        4.  O artigo não aparece mais na lista de admin.
+
+*   **Cenário 9.5: Listar Artigos no Painel de Admin (com Filtros e Paginação)**
+    *   **Pré-condições:** Vários artigos existem com diferentes status, autores, categorias.
+    *   **Passos:**
+        1.  Admin acede à lista de artigos no painel.
+        2.  (Se implementado) Tenta filtrar a lista por `status='draft'`.
+        3.  (Se implementado) Tenta filtrar por uma categoria específica.
+        4.  (Se implementado) Navega para a segunda página da lista (se houver artigos suficientes para paginação).
+    *   **Comportamento Esperado:**
+        1.  Todos os artigos (independentemente do status) são listados por padrão, ou com um filtro padrão (ex: todos exceto arquivados).
+        2.  As informações corretas (título, autor, status, data) são exibidas para cada artigo.
+        3.  Os filtros (se a UI de admin os tiver) funcionam e atualizam a lista de artigos.
+        4.  A paginação (se aplicável) funciona corretamente.
+
+---
+
+**Módulo 10: Visualização Pública do Blog**
+
+*   **Pré-condição Global para Módulo 10:** Alguns artigos foram criados e publicados (ex: "Guia Completo para Comprar Imóvel em Cabo Verde" e "Mercado Imobiliário em Sal 2024 - Publicado"). Um artigo permanece como rascunho (ex: "Ideias de Decoração - Rascunho").
+
+*   **Cenário 10.1: Listar Artigos Públicos**
+    *   **Pré-condições:** N/A (utilizador público, não necessariamente logado).
+    *   **Passos:**
+        1.  Aceder à página principal do blog (ex: `/blog`).
+    *   **Comportamento Esperado:**
+        1.  Pedido `GET /api/articles` é enviado.
+        2.  Apenas os artigos com `status='published'` E `publishedAt` no passado ou presente são listados (ex: "Guia Completo..." e "Mercado Imobiliário em Sal...").
+        3.  O artigo "Ideias de Decoração - Rascunho" NÃO é listado.
+        4.  Os artigos são ordenados pela data de publicação descendente (mais recentes primeiro).
+        5.  Cada item da lista (cartão de artigo) exibe corretamente a imagem de destaque, título, excerto, autor e data.
+        6.  A paginação funciona se houver mais artigos publicados do que o limite por página.
+
+*   **Cenário 10.2: Aceder a Artigo Individual Público**
+    *   **Pré-condições:** Página de listagem do blog está visível.
+    *   **Passos:**
+        1.  Clicar no título ou link "Ler Mais" do artigo "Guia Completo para Comprar Imóvel em Cabo Verde".
+    *   **Comportamento Esperado:**
+        1.  O utilizador é redirecionado para a URL do artigo (ex: `/blog/guia-completo-para-comprar-imovel-em-cabo-verde`).
+        2.  Pedido `GET /api/articles/guia-completo-para-comprar-imovel-em-cabo-verde` é enviado.
+        3.  A página do artigo exibe corretamente o título completo, imagem de destaque, nome do autor, data de publicação, e o conteúdo completo do artigo.
+        4.  (Opcional) Botões de partilha social estão presentes.
+
+*   **Cenário 10.3: Tentar Aceder a Artigo Rascunho/Não Publicado Publicamente**
+    *   **Pré-condições:** Conhecimento do slug de um artigo que está com `status='draft'` (ex: "ideias-de-decoracao-rascunho").
+    *   **Passos:**
+        1.  Tentar aceder diretamente à URL do artigo rascunho (ex: `/blog/ideias-de-decoracao-rascunho`).
+    *   **Comportamento Esperado:**
+        1.  Pedido `GET /api/articles/ideias-de-decoracao-rascunho` é enviado.
+        2.  API retorna erro 404 (Não Encontrado) porque o artigo não está publicado.
+        3.  O utilizador vê uma página de erro 404.
+
+*   **Cenário 10.4: Filtros na Listagem Pública (se implementado na UI pública)**
+    *   **Pré-condições:** Existem artigos publicados em diferentes categorias (ex: "Guias de Compra", "Notícias do Mercado") e com diferentes tags. A UI pública do blog tem controlos de filtro por categoria/tag.
+    *   **Passos:**
+        1.  Na página de listagem do blog, selecionar a categoria "Guias de Compra".
+    *   **Comportamento Esperado:**
+        1.  A lista de artigos é atualizada, mostrando apenas os artigos publicados que pertencem à categoria "Guias de Compra".
+        2.  A paginação é ajustada para os resultados filtrados.
+        3.  Se um filtro de tag for aplicado, o comportamento é similar.
+
+---
+**Nota:** A política de atualização de slugs (Cenário 9.3) é uma decisão de design importante. Atualizar slugs pode quebrar links existentes, então geralmente é feito com cautela ou redirecionamentos são implementados. Para a simulação, pode-se assumir que o slug é atualizado se o artigo não foi amplamente divulgado, ou que permanece o mesmo para evitar problemas de SEO.

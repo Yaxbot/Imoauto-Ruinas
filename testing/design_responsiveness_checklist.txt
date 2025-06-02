@@ -1,0 +1,217 @@
+Checklist de Revisão de Design e Responsividade - Plataforma CaboVerdeProperties
+
+**Referência Principal:** `design/style_guide.txt`, `design/responsiveness_guidelines.txt`
+
+**I. Consistência Visual Geral:**
+
+*   **[ ] Paleta de Cores:**
+    *   [ ] Cores primárias (Azul Oceano #0077B6, Verde Natureza #2D6A4F, Amarelo Sol #FFD700) usadas corretamente para marca, ações principais, e elementos de destaque?
+    *   [ ] Cores secundárias (Branco #FFFFFF, Cinza Claro #F0F0F0, Bege Areia #F5F5DC, Cinzas de Texto) usadas apropriadamente para fundos, texto, e bordas?
+    *   [ ] Cores de destaque/acento (Coral Suave #FF7F50, Verde Esmeralda #50C878) usadas com moderação e eficácia para CTAs importantes ou notificações?
+    *   [ ] Consistência na aplicação das cores em diferentes secções (Pública, Admin, Blog)?
+*   **[ ] Tipografia:**
+    *   [ ] Fonte para Títulos/Cabeçalhos (Montserrat ou Raleway) aplicada consistentemente?
+    *   [ ] Fonte para Corpo de Texto/UI (Open Sans ou Lato) aplicada consistentemente?
+    *   [ ] Hierarquia tipográfica (tamanhos H1-H6, P, Small) clara e respeitada em todas as páginas?
+    *   [ ] Pesos de fonte (Bold, SemiBold, Medium, Regular) usados de forma apropriada para ênfase e legibilidade?
+    *   [ ] Altura da linha e espaçamento entre parágrafos adequados para boa legibilidade?
+*   **[ ] Estilo de Ícones:**
+    *   [ ] Ícones seguem um estilo uniforme (ex: outline, minimalista sólido)?
+    *   [ ] Ícones são de uma única biblioteca ou família visualmente coesa (ex: Material Icons, Font Awesome)?
+    *   [ ] Ícones são claros, compreensíveis e dimensionados adequadamente para o contexto?
+*   **[ ] Espaçamento e Layout:**
+    *   [ ] Uso generoso e consistente de whitespace (espaço em branco) para evitar poluição visual?
+    *   [ ] Elementos de layout (cards, secções, colunas) alinhados a um sistema de grid lógico (ex: 12 colunas)?
+    *   [ ] Margens, paddings e espaçamento entre elementos são consistentes em toda a plataforma?
+*   **[ ] Imagens:**
+    *   [ ] Imagens de placeholder/exemplo são de alta qualidade e representativas?
+    *   [ ] Proporções de imagem consistentes para elementos similares (ex: thumbnails de propriedades, avatares)?
+    *   [ ] Otimização de imagens considerada (para PoC, verificar se a intenção está clara)?
+
+**II. Componentes Comuns de UI:**
+
+*   **[ ] Botões:**
+    *   [ ] Botões primários (CTAs principais) têm estilo visualmente distinto e consistente?
+    *   [ ] Botões secundários e terciários (outras ações) têm estilos consistentes e hierarquia clara em relação aos primários?
+    *   [ ] Estados dos botões (`:hover`, `:active`, `:disabled`, `:focus`) são visualmente claros e consistentes?
+    *   [ ] Tamanho dos botões é adequado para fácil interação (especialmente em mobile)?
+*   **[ ] Formulários:**
+    *   [ ] Campos de input (texto, email, password, select, textarea, file) têm um estilo visual uniforme?
+    *   [ ] Labels dos campos são claras, bem posicionadas (geralmente acima do campo) e associadas corretamente aos seus inputs?
+    *   [ ] Validação de erros nos formulários é apresentada de forma clara e consistente?
+    *   [ ] Placeholders são usados efetivamente sem substituir labels?
+*   **[ ] Navegação:**
+    *   [ ] Navegação principal (global do site) é clara, proeminente e consistente em todas as páginas?
+    *   [ ] Navegação secundária (ex: dentro do painel de admin, ou tabs numa página) é intuitiva e visualmente distinta da principal?
+    *   [ ] Breadcrumbs (se usados) são precisos e fáceis de seguir?
+    *   [ ] Links têm um estilo consistente e são facilmente identificáveis?
+*   **[ ] Feedback ao Utilizador:**
+    *   [ ] Mensagens de sucesso, erro, aviso e informação têm estilos consistentes e são facilmente distinguíveis?
+    *   [ ] Indicadores de carregamento (loading spinners, barras de progresso) são usados para operações demoradas e têm estilo consistente?
+    *   [ ] Modais e pop-ups (para confirmações, alertas) têm um design consistente com o resto da plataforma?
+
+**III. Responsividade (Avaliar para cada tipo de página principal):**
+    *(Páginas de Autenticação, Perfil, Listagem Admin, Formulário Admin, Listagem Pública Propriedades, Detalhe Propriedade, Listagem Blog, Artigo Blog)*
+
+*   **[ ] Layout Geral:**
+    *   [ ] Layout adapta-se fluidamente a diferentes breakpoints (mobile <576px, phablet >=576px, tablet >=768px, desktop >=992px, desktop largo >=1200px)?
+    *   [ ] Conteúdo é reorganizado ou empilhado verticalmente em telas menores de forma lógica?
+    *   [ ] Não há conteúdo cortado ou barras de scroll horizontais desnecessárias em nenhum breakpoint?
+*   **[ ] Imagens Responsivas:**
+    *   [ ] Imagens redimensionam-se corretamente dentro dos seus contentores sem distorção ou overflow?
+    *   [ ] (Consideração) Uso de `<picture>` ou `srcset` para servir imagens otimizadas por tamanho de tela?
+*   **[ ] Tipografia Responsiva:**
+    *   [ ] Tamanhos de fonte são legíveis em todas as telas (podem ser ligeiramente menores em mobile, mas não muito)?
+    *   [ ] Comprimento das linhas de texto permanece confortável para leitura em diferentes larguras?
+*   **[ ] Navegação Adaptável:**
+    *   [ ] Menu principal colapsa para um menu hambúrguer (ou similar) em telas menores?
+    *   [ ] O menu hambúrguer é fácil de encontrar e usar?
+    *   [ ] Navegação em tabs (se houver) funciona bem em mobile (ex: scroll horizontal com indicação, ou transforma-se em acordeão/select)?
+*   **[ ] Interatividade Mobile:**
+    *   [ ] Botões e outros elementos de toque têm tamanho suficiente para serem facilmente clicáveis em telas de toque?
+    *   [ ] Campos de formulário são fáceis de preencher em mobile (ex: largura total, tipo de input correto para teclado mobile)?
+    *   [ ] Mapa interativo é navegável (pan, zoom) e os pop-ups dos marcadores são utilizáveis em mobile?
+    *   [ ] Galerias de imagens suportam gestos de swipe em mobile?
+*   **[ ] Priorização de Conteúdo:**
+    *   [ ] Conteúdo mais importante é visível ou facilmente acessível em telas menores sem scroll excessivo?
+
+**IV. Acessibilidade (Considerações Básicas para PoC):**
+
+*   **[ ] Contraste de Cores:**
+    *   [ ] Contraste entre texto e cor de fundo é suficiente para boa legibilidade (especialmente para texto de corpo e elementos de UI)?
+    *   [ ] Links se destacam do texto normal (ex: cor e sublinhado, ou apenas cor se o contraste for alto)?
+*   **[ ] Texto Descritivo:**
+    *   [ ] Links têm texto que descreve o seu destino (ex: "Ver Detalhes" em vez de "Clique Aqui")?
+    *   [ ] Botões têm texto claro que indica a sua ação?
+*   **[ ] Foco Visível:**
+    *   [ ] Elementos focáveis (links, botões, campos de formulário) têm um indicador de foco visível ao navegar com o teclado (outline padrão do navegador ou estilizado)?
+*   **[ ] (Consideração Futura - Não estritamente para PoC, mas bom ter em mente):**
+    *   [ ] Uso de ARIA labels para elementos não textuais (ex: ícones sem texto).
+    *   [ ] Semântica HTML correta (uso de `<nav>`, `<main>`, `<article>`, `<aside>`, etc.).
+    *   [ ] Navegação por teclado funcional em toda a plataforma.
+
+Esta checklist será usada para "revisar" mentalmente cada interface simulada.O arquivo `testing/design_responsiveness_checklist.txt` foi criado com sucesso. Agora, vou prosseguir com a "revisão" simulada das interfaces e a documentação dos resultados.
+
+**2. Revisar Interfaces Implementadas (Simuladamente)**
+
+Vou percorrer mentalmente cada uma das principais secções da UI "implementadas", aplicando a checklist.
+
+*   **Páginas de Autenticação (Registo, Login - `ui_definitions/auth_ui.txt`)**
+    *   **Consistência Visual:**
+        *   Paleta: Assumindo que usaria primárias para botões, secundárias para fundos/texto. OK.
+        *   Tipografia: Hierarquia para título da página, labels, inputs, links. OK.
+        *   Ícones: Mínimo uso aqui, talvez para campos de password. OK.
+        *   Espaçamento: Layout de formulário centralizado, bom espaçamento. OK.
+    *   **Componentes Comuns:**
+        *   Botões ("Registar", "Login"): Estilo primário. OK.
+        *   Formulários: Campos e labels consistentes. OK.
+        *   Navegação: Links para alternar entre registo/login. OK.
+        *   Feedback: Mensagens de erro/sucesso definidas. OK.
+    *   **Responsividade:**
+        *   Layout: Formulários de coluna única em mobile, centralizados em desktop. OK (conforme notas em `auth_ui.txt`).
+        *   Imagens: Não aplicável (sem imagens complexas aqui).
+        *   Texto: Legível. OK.
+        *   Navegação: Links simples, adaptam-se bem. OK.
+        *   Interatividade Mobile: Campos a 100% de largura em mobile, botões fáceis de tocar. OK.
+    *   **Acessibilidade:**
+        *   Contraste: Assumindo cores padrão com bom contraste. OK.
+        *   Texto Descritivo: Labels e botões claros. OK.
+
+*   **Página de Perfil do Utilizador (`ui_definitions/auth_ui.txt`)**
+    *   **Consistência Visual:** Similar às páginas de autenticação. OK.
+    *   **Componentes Comuns:** Formulário de edição, botões de ação. OK.
+    *   **Responsividade:**
+        *   Layout: Secções empilhadas ou abas responsivas. OK (conforme notas em `auth_ui.txt`).
+        *   Interatividade Mobile: Upload de foto precisaria de atenção especial para ser mobile-friendly.
+    *   **Acessibilidade:** OK.
+
+*   **Painel de Administração (Geral, Listagens, Formulários - `ui_definitions/admin_properties_ui.txt`, `admin_blog_ui.txt`)**
+    *   **Consistência Visual:**
+        *   Paleta: Pode usar um esquema ligeiramente diferente para o admin (ex: primária mais sóbria), mas deve ser consistente dentro do admin.
+        *   Tipografia: Hierarquia clara para títulos de secção, tabelas, formulários. OK.
+        *   Ícones: Usados para ações em tabelas (editar, eliminar). OK.
+        *   Espaçamento: Tabelas e formulários precisam de bom espaçamento para não parecerem densos.
+    *   **Componentes Comuns:**
+        *   Botões: Ações consistentes ("Novo", "Guardar", "Eliminar"). OK.
+        *   Formulários: Muitos campos, precisam de agrupamento lógico e consistência. OK.
+        *   Navegação: Menu lateral para secções do admin. OK.
+        *   Feedback: Mensagens de CRUD. OK.
+    *   **Responsividade:**
+        *   Layout: Tabelas em admin são o maior desafio. Em mobile, podem precisar de scroll horizontal ou colunas "colapsáveis" / reorganização em cards. Formulários longos devem ser bem segmentados.
+        *   Navegação: Menu lateral pode colapsar para um ícone em mobile.
+        *   Interatividade Mobile: Clicar em linhas de tabela, usar filtros e paginação em mobile.
+    *   **Acessibilidade:** Contraste em tabelas (linhas alternadas) pode ajudar.
+
+*   **Página de Listagem Pública de Propriedades (`ui_definitions/public_properties_ui.txt`)**
+    *   **Consistência Visual:**
+        *   Paleta: Cores primárias para CTAs ("Ver Detalhes"), secundárias para cards. OK.
+        *   Tipografia: Títulos de cards, preços, localização com hierarquia. OK.
+        *   Ícones: Para características (quartos, WC), localização no mapa. OK.
+        *   Espaçamento: Entre cards, entre filtros e lista. OK.
+        *   Imagens: Thumbnails de propriedades de alta qualidade são chave. OK.
+    *   **Componentes Comuns:**
+        *   Botões: "Ver Detalhes", paginação, aplicar filtros. OK.
+        *   Formulários: Controlos de filtro (dropdowns, sliders). OK.
+        *   Navegação: Paginação, ordenação. OK.
+    *   **Responsividade:**
+        *   Layout: Grelha de cards responsiva (1 coluna mobile, 2-3 tablet/desktop). Filtros em modal/off-canvas em mobile. OK (conforme notas).
+        *   Mapa: Precisa ser responsivo e utilizável em mobile. OK (conforme notas).
+    *   **Acessibilidade:** OK.
+
+*   **Página de Detalhe da Propriedade (`ui_definitions/public_properties_ui.txt`)**
+    *   **Consistência Visual:**
+        *   Paleta: Foco na galeria de imagens. CTAs ("Mostrar Interesse", "Transformar com IA") destacados. OK.
+        *   Tipografia: Descrição longa precisa de boa legibilidade. OK.
+        *   Ícones: Para características, partilha social. OK.
+    *   **Componentes Comuns:**
+        *   Botões: CTAs. OK.
+        *   Galerias de Imagens: Navegação clara. OK.
+    *   **Responsividade:**
+        *   Layout: Galeria de imagens com swipe em mobile. Secções de informação empilhadas. OK (conforme notas).
+        *   Secção de IA: Precisa adaptar-se bem, especialmente a área de resultado lado-a-lado.
+    *   **Acessibilidade:** OK.
+
+*   **Páginas do Blog (Listagem e Artigo Individual - `ui_definitions/public_blog_ui.txt`)**
+    *   **Consistência Visual:**
+        *   Paleta: Pode seguir o esquema principal do site público, talvez com uma cor de acento para elementos do blog. OK.
+        *   Tipografia: Foco na legibilidade para artigos longos. Hierarquia para títulos, metadados, corpo. OK.
+        *   Imagens: Imagens de destaque. OK.
+    *   **Componentes Comuns:**
+        *   Botões: "Ler Mais", paginação. OK.
+        *   Navegação: Entre artigos, categorias/tags. OK.
+    *   **Responsividade:**
+        *   Layout: Listagem de cards responsiva. Artigo individual com conteúdo fluído. OK.
+        *   Tipografia: Garantir que o tamanho da fonte do artigo é confortável em mobile.
+    *   **Acessibilidade:** OK.
+
+**3. Reportar Descobertas e Recomendações (Conceptual)**
+
+*   **Confirmação da Revisão:** A revisão geral do design e responsividade foi realizada mentalmente, aplicando a checklist criada às UIs simuladas.
+
+*   **Áreas Gerais Bem Aplicadas (Conceptual):**
+    *   A definição inicial da paleta de cores e tipografia nos guias parece ter sido considerada na descrição da maioria das UIs, promovendo uma base para consistência.
+    *   A abordagem mobile-first foi explicitamente mencionada nas diretrizes de responsividade e refletida nas notas adicionadas a alguns arquivos de UI, o que é um bom sinal.
+    *   A estrutura básica de componentes comuns (botões, formulários simples) parece alinhada com as diretrizes.
+
+*   **Inconsistências de Design ou Problemas de Responsividade Identificados (Conceptual):**
+    1.  **Painel de Administração - Tabelas e Formulários Complexos:**
+        *   **Design:** Embora os campos tenham sido definidos, a consistência visual exata de formulários de admin muito longos (ex: criar/editar propriedade, criar/editar artigo) pode ser um desafio. Agrupamento visual de campos (fieldsets) e espaçamento consistente são cruciais e precisam de atenção real.
+        *   **Responsividade:** Tabelas de dados densas (ex: lista de propriedades no admin, lista de interesses) são notoriamente difíceis em mobile. A simples menção de "scroll horizontal ou colunas colapsáveis" precisa de um design UX cuidadoso para ser verdadeiramente utilizável. Pode ser necessário simplificar drasticamente a informação visível por defeito em mobile.
+    2.  **Painel de Administração - Cores:** Não foi explicitamente definido se o painel de admin usaria uma variação da paleta principal ou um tema mais funcional/sóbrio. Isso poderia levar a inconsistências se não for definido.
+    3.  **Secção de IA na Página de Detalhes:**
+        *   **Responsividade:** A exibição lado-a-lado da imagem original e transformada precisará de um fallback elegante para telas menores (ex: empilhar verticalmente ou usar um slider de antes/depois que funcione bem com toque).
+    4.  **Filtros Avançados (Público e Admin):**
+        *   **Responsividade:** A apresentação de múltiplos filtros em mobile (ex: na listagem de propriedades públicas ou na listagem de admin) necessita de um padrão de UI bem pensado (modal, off-canvas drawer). Apenas mencionar que "filtros podem ser acedidos via botão modal" é o começo; o design desse modal é importante.
+    5.  **Consistência de Feedback ao Utilizador:** Embora se tenha mencionado que as mensagens de erro/sucesso seriam estilizadas, a forma e posição exatas (ex: toasts, alertas inline) precisam de ser consistentes em toda a plataforma.
+    6.  **Ícones em Ações Específicas:** A consistência no uso de ícones para ações CRUD (Criar, Editar, Eliminar, Ver) em todas as tabelas de admin deve ser verificada.
+
+*   **Recomendações para Ajustes ou Pontos de Atenção na Implementação Real:**
+    1.  **Prototipagem para Admin em Mobile:** Criar protótipos específicos de baixa/média fidelidade para as tabelas de dados e formulários longos do painel de administração em telas mobile. Testar diferentes abordagens para apresentar dados densos.
+    2.  **Definir um Sub-tema para o Painel de Admin:** Se necessário, definir uma variação da paleta de cores ou um conjunto de componentes ligeiramente diferente para o painel de admin para otimizar a funcionalidade e clareza, mantendo a ligação com a marca principal.
+    3.  **Design Detalhado para Componentes Interativos Complexos:** Detalhar o design e comportamento da galeria de imagens responsiva, do comparador de imagens da IA, e dos painéis de filtros avançados em mobile.
+    4.  **Guia de Estilo para Mensagens de Feedback:** Especificar os diferentes tipos de mensagens (sucesso, erro, aviso, informação) e como/onde elas devem aparecer.
+    5.  **Biblioteca de Componentes Reutilizáveis:** Durante a implementação real, desenvolver ou usar uma biblioteca de componentes de UI (botões, inputs, cards, modais, etc.) que já encapsulem o estilo e a responsividade definidos nos guias. Isso ajudará a manter a consistência.
+    6.  **Testes de Usabilidade em Dispositivos Reais:** Enfatizar a necessidade de testes contínuos em dispositivos reais (mobile, tablet, desktop) durante todo o ciclo de desenvolvimento para identificar e corrigir problemas de responsividade e usabilidade que não são aparentes na simulação.
+    7.  **Revisão de Acessibilidade:** Para além do básico, planear uma revisão de acessibilidade mais aprofundada (ex: navegação por teclado completa, ARIA attributes) antes do lançamento.
+
+Esta revisão conceptual ajuda a antecipar desafios e a refinar o foco para a fase de implementação visual e de frontend real na `lovable.dev`.

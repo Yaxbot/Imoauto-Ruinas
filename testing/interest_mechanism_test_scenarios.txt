@@ -1,0 +1,95 @@
+Cenários de Teste - Mecanismo de "Mostrar Interesse"
+
+**Módulo 6: Fluxo do Utilizador Comum ao Mostrar Interesse**
+
+*   **Cenário 6.1: Mostrar Interesse - Utilizador Não Logado**
+    *   **Pré-condições:** N/A (utilizador não está logado).
+    *   **Passos:**
+        1.  Navegar para a página de detalhes de uma propriedade pública qualquer.
+        2.  Localizar e clicar no botão "Mostrar Interesse" (ou similar).
+    *   **Comportamento Esperado:**
+        1.  Nenhuma chamada à API de criação de interesse é feita.
+        2.  Um pop-up/modal aparece, solicitando ao utilizador para "Fazer Login" ou "Registar-se" para continuar.
+        3.  O modal contém links para as páginas de login e registo.
+        4.  Nenhum registo de `Interest` é criado na base de dados.
+
+*   **Cenário 6.2: Mostrar Interesse - Utilizador Logado, Sucesso**
+    *   **Pré-condições:**
+        *   Utilizador "comum_user@example.com" está logado.
+        *   Existe uma propriedade "Propriedade Teste X" (ID: `propX`) visível publicamente.
+    *   **Passos:**
+        1.  Utilizador "comum_user@example.com" navega para a página de detalhes da "Propriedade Teste X".
+        2.  (Opcional) Digita uma mensagem no campo de mensagem associado ao botão "Mostrar Interesse" (ex: "Gostaria de agendar uma visita.").
+        3.  Clica no botão "Mostrar Interesse".
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/properties/propX/interests` é enviado com o token do utilizador e a mensagem opcional.
+        2.  API retorna sucesso (201 Created) com os dados do interesse criado.
+        3.  Um novo registo `Interest` é criado na base de dados, associando `comum_user@example.com` (userId) com `propX` (propertyId), a mensagem fornecida, e `status='new'`.
+        4.  Na UI, o botão "Mostrar Interesse" muda para um estado indicando sucesso (ex: "Interesse Enviado ✓" e fica desabilitado) ou uma mensagem de confirmação é exibida.
+        5.  Uma notificação por email (simulada) é enviada para o endereço de email do administrador.
+
+*   **Cenário 6.3: Mostrar Interesse Duplicado (Assumindo Política de Permitir, mas Atualizar ou Informar)**
+    *   **Pré-condições:**
+        *   Utilizador "comum_user@example.com" já manifestou interesse (Cenário 6.2) na "Propriedade Teste X" e esse interesse tem `status='new'`.
+        *   O botão "Mostrar Interesse" pode estar re-habilitado após um tempo, ou a UI permite um novo envio. (A política exata aqui é importante: se não permite duplicados com status 'new', o botão deveria estar desabilitado).
+    *   **Passos:**
+        1.  Utilizador "comum_user@example.com" navega novamente para a página de detalhes da "Propriedade Teste X".
+        2.  Clica novamente no botão "Mostrar Interesse" (talvez com uma nova mensagem).
+    *   **Comportamento Esperado (Variante 1 - Não permite duplicado com status 'new'):**
+        1.  A UI já deveria indicar que o interesse foi enviado (botão desabilitado).
+        2.  Se, por alguma falha na UI, o pedido for enviado, a API retorna um erro (ex: 409 Conflict) "Interesse já manifestado e pendente."
+        3.  Nenhum novo registo `Interest` é criado.
+    *   **Comportamento Esperado (Variante 2 - Permite "atualizar" interesse ou adicionar novo se política permitir):**
+        1.  Pedido `POST /api/properties/propX/interests` é enviado.
+        2.  A API pode criar um novo registo `Interest` ou atualizar o existente (ex: nova mensagem, `updatedAt`). (A lógica exata foi simplificada na implementação simulada para criar novo, mas um sistema real poderia ter uma política mais complexa).
+        3.  Mensagem de sucesso é exibida.
+
+*   **Cenário 6.4: Mostrar Interesse em Propriedade Inválida/Não Pública**
+    *   **Pré-condições:** Utilizador "comum_user@example.com" está logado.
+    *   **Passos:**
+        1.  (Simulação de falha ou acesso indevido) O frontend tenta fazer uma chamada `POST /api/properties/prop_INVALID/interests` para um `propertyId` que não existe ou não está ativo. (Normalmente a UI não permitiria isso, pois o botão só apareceria em páginas de propriedades válidas).
+    *   **Comportamento Esperado:**
+        1.  API retorna um erro (ex: 404 Not Found para `prop_INVALID` ou se a propriedade não for 'active').
+        2.  Nenhum registo `Interest` é criado.
+        3.  A UI do utilizador exibe uma mensagem de erro genérica (ex: "Ocorreu um erro ao enviar o seu interesse.").
+
+---
+
+**Módulo 7: Fluxo do Administrador Relacionado a Interesses**
+
+*   **Pré-condição Global para Módulo 7:** Utilizador "admin@example.com" com `role='admin'` está logado.
+
+*   **Cenário 7.1: Verificar Notificação por Email (Simulado)**
+    *   **Pré-condições:** Cenário 6.2 foi executado (utilizador comum manifestou interesse).
+    *   **Passos:**
+        1.  (Simulação) Verificar o "sistema de email" do administrador.
+    *   **Comportamento Esperado:**
+        1.  Um email (simulado como "enviado" pela lógica do backend) foi recebido no endereço de email do administrador.
+        2.  O email contém:
+            *   Assunto: "Novo Interesse Recebido: Propriedade Teste X - comum_user@example.com" (ou nome do user).
+            *   Corpo: Detalhes do utilizador (nome, email, telefone), detalhes da propriedade (título, link para a página da propriedade no admin e pública), e a mensagem opcional enviada pelo utilizador.
+
+*   **Cenário 7.2: Listar Interesses no Painel de Administração**
+    *   **Pré-condições:** Cenário 6.2 foi executado. Admin está logado.
+    *   **Passos:**
+        1.  Admin navega para a secção "Interesses Recebidos" (ou `/admin/interests`) no painel de administração.
+    *   **Comportamento Esperado:**
+        1.  Pedido `GET /api/admin/interests` é enviado.
+        2.  API retorna sucesso (200 OK) com a lista de interesses.
+        3.  O interesse registado por "comum_user@example.com" na "Propriedade Teste X" aparece na lista.
+        4.  A lista exibe corretamente: Data do interesse, Nome do Utilizador, Contacto do Utilizador, Título da Propriedade (com link), preview da Mensagem (se houver), e o Status inicial ('new').
+        5.  Paginação e filtros (se implementados na UI do admin para interesses) estão funcionais.
+
+*   **Cenário 7.3: Atualizar Status de Interesse (se endpoint `PUT /api/admin/interests/{id}` implementado)**
+    *   **Pré-condições:** O interesse do Cenário 6.2 está listado no painel de admin com `status='new'`.
+    *   **Passos:**
+        1.  Admin localiza o interesse na lista.
+        2.  Muda o status do interesse para "Contactado" usando um controlo na UI (ex: um dropdown na linha da tabela e um botão "Salvar Status" ou mudança automática ao selecionar).
+    *   **Comportamento Esperado:**
+        1.  Pedido `PUT /api/admin/interests/{interestId}` é enviado com `{ "status": "contacted" }`.
+        2.  API retorna sucesso (200 OK) com o interesse atualizado.
+        3.  O status do interesse é atualizado na base de dados para "contacted" e o campo `updatedAt` é modificado.
+        4.  A UI do painel de administração reflete a mudança de status para esse interesse (ou a linha é atualizada/recarregada).
+
+---
+**Nota:** A política exata para o Cenário 6.3 (Interesse Duplicado) precisaria de uma definição mais clara na lógica de negócios real (se permite, se atualiza o existente, se cria novo, ou se bloqueia se o status anterior ainda for 'new'). A simulação atual da API de criação de interesse é mais simples e pode criar um novo interesse ou exigir uma lógica de "upsert" mais elaborada. Para o teste, ambas as variantes de comportamento esperado foram consideradas.

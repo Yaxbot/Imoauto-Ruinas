@@ -1,0 +1,179 @@
+Cenários de Teste Iniciais - Plataforma CaboVerdeProperties
+
+**Módulo 1: Autenticação e Gestão de Perfil de Utilizador**
+
+*   **Cenário 1.1: Registo de Novo Utilizador Bem Sucedido**
+    *   **Pré-condições:** Nenhum utilizador com o email de teste existe.
+    *   **Passos:**
+        1.  Navegar para a página de registo (`/register`).
+        2.  Preencher o campo "Nome" (ex: "Utilizador Teste").
+        3.  Preencher o campo "Email" com um email válido e não existente (ex: "teste@example.com").
+        4.  Preencher o campo "Password" com uma password forte (ex: "Password123!").
+        5.  Preencher o campo "Confirmar Password" com a mesma password ("Password123!").
+        6.  Preencher o campo "Nacionalidade" (ex: "Cabo Verdiana").
+        7.  Preencher o campo "Telefone" (ex: "9876543").
+        8.  (Opcional) Preencher o campo "WhatsApp" (ex: "9876543").
+        9.  Clicar no botão "Registar".
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/users/register` é enviado com os dados.
+        2.  API retorna sucesso (201 Created).
+        3.  Um novo utilizador é criado na base de dados com os dados fornecidos, `role` = 'common', e password hashed.
+        4.  O utilizador é redirecionado para a página de login (`/login`) ou uma página de "Registo bem-sucedido, por favor faça login".
+        5.  Uma mensagem de sucesso é exibida (ex: "Registo efetuado com sucesso!").
+
+*   **Cenário 1.2: Registo com Email Duplicado**
+    *   **Pré-condições:** Um utilizador com o email "existente@example.com" já existe.
+    *   **Passos:**
+        1.  Navegar para a página de registo (`/register`).
+        2.  Preencher os campos obrigatórios, usando "existente@example.com" no campo "Email".
+        3.  Clicar no botão "Registar".
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/users/register` é enviado.
+        2.  API retorna erro (409 Conflict).
+        3.  Nenhum novo utilizador é criado.
+        4.  Uma mensagem de erro é exibida na página de registo (ex: "Este endereço de email já está em uso.").
+
+*   **Cenário 1.3: Login Bem Sucedido**
+    *   **Pré-condições:** Utilizador "teste@example.com" existe e está registado com password "Password123!".
+    *   **Passos:**
+        1.  Navegar para a página de login (`/login`).
+        2.  Preencher o campo "Email" com "teste@example.com".
+        3.  Preencher o campo "Password" com "Password123!".
+        4.  Clicar no botão "Login".
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/users/login` é enviado.
+        2.  API retorna sucesso (200 OK) com token JWT e dados do utilizador.
+        3.  O token JWT é armazenado no cliente (localStorage/sessionStorage).
+        4.  O utilizador é redirecionado para a sua página de painel (ex: `/dashboard`) ou para a página inicial como utilizador logado.
+
+*   **Cenário 1.4: Login com Password Inválida**
+    *   **Pré-condições:** Utilizador "teste@example.com" existe.
+    *   **Passos:**
+        1.  Navegar para a página de login (`/login`).
+        2.  Preencher o campo "Email" com "teste@example.com".
+        3.  Preencher o campo "Password" com uma password incorreta (ex: "Errada123!").
+        4.  Clicar no botão "Login".
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/users/login` é enviado.
+        2.  API retorna erro (401 Unauthorized).
+        3.  O utilizador permanece na página de login.
+        4.  Uma mensagem de erro é exibida (ex: "Email ou palavra-passe incorretos.").
+
+*   **Cenário 1.5: Visualizar Perfil do Utilizador**
+    *   **Pré-condições:** Utilizador "teste@example.com" está logado.
+    *   **Passos:**
+        1.  Navegar para a página de perfil (ex: através de um link "Meu Perfil" na navegação).
+    *   **Comportamento Esperado:**
+        1.  Pedido `GET /api/users/me` é enviado (com token JWT).
+        2.  API retorna sucesso (200 OK) com os dados do utilizador "teste@example.com".
+        3.  A página de perfil exibe corretamente o nome, email, nacionalidade, telefone, etc., do utilizador. Os campos de edição também são preenchidos.
+
+*   **Cenário 1.6: Editar Perfil do Utilizador Bem Sucedido**
+    *   **Pré-condições:** Utilizador "teste@example.com" está logado e na página de perfil.
+    *   **Passos:**
+        1.  Modificar o campo "Nome" para "Utilizador Teste Editado".
+        2.  Modificar o campo "Telefone" para "9999999".
+        3.  (Opcional) Selecionar uma nova foto de perfil (simular o processo de upload que resulta numa URL).
+        4.  Clicar no botão "Guardar Alterações".
+    *   **Comportamento Esperado:**
+        1.  Pedido `PUT /api/users/me` é enviado com os dados `{ "name": "Utilizador Teste Editado", "phone": "9999999", "profilePictureUrl": "nova_url_da_foto.jpg" }`.
+        2.  API retorna sucesso (200 OK) com os dados atualizados.
+        3.  Os dados do utilizador na base de dados são atualizados.
+        4.  A página de perfil exibe os dados atualizados ("Utilizador Teste Editado", "9999999").
+        5.  Uma mensagem de sucesso é exibida (ex: "Perfil atualizado com sucesso!").
+
+*   **Cenário 1.7: Logout do Utilizador**
+    *   **Pré-condições:** Utilizador "teste@example.com" está logado.
+    *   **Passos:**
+        1.  Clicar no link/botão "Logout" na navegação.
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/users/logout` é enviado (com token JWT).
+        2.  API retorna sucesso (200 OK).
+        3.  O token JWT é removido do armazenamento do cliente.
+        4.  O utilizador é redirecionado para a página de login (`/login`) ou para a página inicial pública.
+
+---
+
+**Módulo 2: CRUD de Propriedades (Painel de Administração)**
+
+*   **Pré-condição Global para Módulo 2:** Um utilizador com `role='admin'` (ex: "admin@example.com") está logado.
+
+*   **Cenário 2.1: Criar Nova Propriedade Bem Sucedido**
+    *   **Passos:**
+        1.  Admin navega para a secção "Gerir Propriedades" no painel de admin.
+        2.  Clica em "Adicionar Nova Propriedade".
+        3.  Preenche todos os campos obrigatórios do formulário com dados válidos:
+            *   Título: "Moradia T3 Espaçosa em Palmarejo"
+            *   Descrição: "Excelente moradia com 3 quartos, vista mar..."
+            *   Tipo de Propriedade: "House"
+            *   Preço: 15000000
+            *   Moeda: "CVE"
+            *   Estado: "Pending Approval" (ou "Active" se o admin puder publicar diretamente)
+            *   Ilha: "Santiago"
+            *   Concelho: "Praia"
+            *   (Simular upload de 2-3 imagens para a galeria, resultando em URLs)
+        4.  Preenche campos opcionais conforme desejado.
+        5.  Clica em "Guardar Propriedade".
+    *   **Comportamento Esperado:**
+        1.  (Se houver upload) Pedidos `POST /api/files/upload` são feitos para cada imagem, retornando URLs.
+        2.  Pedido `POST /api/admin/properties` é enviado com todos os dados da propriedade, incluindo as URLs das imagens.
+        3.  API retorna sucesso (201 Created) com os dados da propriedade criada.
+        4.  Uma nova propriedade é criada na base de dados.
+        5.  Admin é redirecionado para a lista de propriedades ou vê uma mensagem de sucesso.
+        6.  A nova propriedade ("Moradia T3 Espaçosa em Palmarejo") aparece na lista de propriedades no painel de admin.
+
+*   **Cenário 2.2: Criar Propriedade com Dados Inválidos/Faltantes**
+    *   **Passos:**
+        1.  Admin navega para o formulário de adicionar propriedade.
+        2.  Deixa o campo obrigatório "Título" em branco.
+        3.  Preenche outros campos.
+        4.  Clica em "Guardar Propriedade".
+    *   **Comportamento Esperado:**
+        1.  Validação no frontend impede a submissão OU (se a validação frontend falhar/não existir) pedido `POST /api/admin/properties` é enviado.
+        2.  API retorna erro de validação (400 Bad Request ou 422 Unprocessable Entity) indicando que o campo "Título" é obrigatório.
+        3.  Nenhuma propriedade é criada.
+        4.  Uma mensagem de erro é exibida no formulário, destacando o campo problemático.
+
+*   **Cenário 2.3: Listar Propriedades no Painel de Admin**
+    *   **Pré-condições:** Existem algumas propriedades na base de dados.
+    *   **Passos:**
+        1.  Admin navega para a secção "Gerir Propriedades".
+    *   **Comportamento Esperado:**
+        1.  Pedido `GET /api/admin/properties` é enviado.
+        2.  API retorna sucesso (200 OK) com a lista de propriedades e informações de paginação.
+        3.  A tabela/lista de propriedades é preenchida corretamente, exibindo colunas como Título, Ilha, Preço, Estado.
+        4.  Controlos de paginação estão funcionais se houver mais propriedades do que o limite por página.
+        5.  Filtros (ex: por estado) podem ser aplicados e atualizam a lista.
+
+*   **Cenário 2.4: Editar Propriedade Bem Sucedido**
+    *   **Pré-condições:** A propriedade "Moradia T3 Espaçosa em Palmarejo" existe.
+    *   **Passos:**
+        1.  Admin encontra a propriedade na lista e clica em "Editar".
+        2.  O formulário de edição é carregado com os dados da propriedade.
+        3.  Admin altera o "Preço" para 16000000.
+        4.  Admin altera o "Estado" para "Active".
+        5.  Clica em "Guardar Alterações".
+    *   **Comportamento Esperado:**
+        1.  Pedido `PUT /api/admin/properties/{propertyId}` é enviado com os dados atualizados.
+        2.  API retorna sucesso (200 OK) com os dados da propriedade atualizada.
+        3.  Os dados da propriedade são atualizados na base de dados.
+        4.  Admin é redirecionado para a lista de propriedades ou vê uma mensagem de sucesso.
+        5.  A lista de propriedades reflete o novo preço e estado para "Moradia T3 Espaçosa em Palmarejo".
+
+*   **Cenário 2.5: Eliminar Propriedade**
+    *   **Pré-condições:** A propriedade "Moradia T3 Espaçosa em Palmarejo" existe.
+    *   **Passos:**
+        1.  Admin encontra a propriedade na lista.
+        2.  Clica no botão "Eliminar".
+        3.  Um diálogo de confirmação aparece (ex: "Tem a certeza que deseja eliminar esta propriedade?").
+        4.  Admin confirma a eliminação.
+    *   **Comportamento Esperado:**
+        1.  Pedido `DELETE /api/admin/properties/{propertyId}` é enviado.
+        2.  API retorna sucesso (200 OK ou 204 No Content).
+        3.  A propriedade é removida da base de dados.
+        4.  (Idealmente) As imagens associadas à propriedade também são removidas do armazenamento.
+        5.  A propriedade "Moradia T3 Espaçosa em Palmarejo" não aparece mais na lista de propriedades.
+        6.  Uma mensagem de sucesso é exibida.
+
+---
+**Nota:** Estes cenários assumem que a "lovable.dev" providencia as ferramentas necessárias para construir as UIs (formulários, tabelas, modais) e que a lógica de backend (controladores, modelos) pode ser implementada conforme descrito nas sub-tarefas anteriores. A interação com a base de dados e o sistema de arquivos (para uploads) é também uma capacidade assumida da plataforma.

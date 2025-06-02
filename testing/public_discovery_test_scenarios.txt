@@ -1,0 +1,306 @@
+Cenários de Teste - Descoberta Pública de Propriedades (Listagem, Detalhes, Pesquisa, Filtros, Mapa)
+
+**Módulo 3: Visualização de Listagem e Detalhes de Propriedades Públicas**
+
+*   **Cenário 3.1: Listagem Pública Padrão**
+    *   **Pré-condições:** Existem propriedades na base de dados, algumas com `status='active'` e `publishedAt` no passado, outras com status diferentes (ex: 'draft', 'pending_approval') ou `publishedAt` no futuro.
+    *   **Passos:**
+        1.  Aceder à página principal de listagem de imóveis (ex: `/imoveis`).
+    *   **Comportamento Esperado:**
+        1.  Apenas as propriedades com `status='active'` e `publishedAt` não futuro são exibidas.
+        2.  As propriedades são apresentadas na ordem padrão (ex: data de adição descendente).
+        3.  Se o número de propriedades ativas exceder o limite por página, a paginação é exibida e funcional.
+        4.  Cada item na lista mostra informações resumidas corretas (imagem, título, preço, localização).
+
+*   **Cenário 3.2: Ordenação da Lista**
+    *   **Pré-condições:** Página de listagem pública está visível com múltiplas propriedades.
+    *   **Passos:**
+        1.  Localizar o controlo de ordenação (ex: dropdown "Ordenar por").
+        2.  Selecionar "Preço (Ascendente)".
+        3.  Observar a lista.
+        4.  Selecionar "Preço (Descendente)".
+        5.  Observar a lista.
+        6.  Selecionar "Mais Recentes" (ou ordenação por data descendente).
+    *   **Comportamento Esperado:**
+        1.  Após cada seleção, a lista de propriedades é atualizada e reordenada corretamente de acordo com o critério escolhido.
+        2.  A paginação, se presente, continua a funcionar com a nova ordem.
+
+*   **Cenário 3.3: Acesso à Página de Detalhes da Propriedade**
+    *   **Pré-condições:** Página de listagem pública está visível.
+    *   **Passos:**
+        1.  Clicar no título, imagem ou botão "Ver Detalhes" de uma propriedade listada.
+    *   **Comportamento Esperado:**
+        1.  O utilizador é redirecionado para a página de detalhes dessa propriedade.
+        2.  A URL da página de detalhes é amigável (ex: `/imovel/slug-da-propriedade`).
+        3.  Todas as informações detalhadas da propriedade (galeria de imagens, descrição completa, características, localização, preço, etc.) são exibidas corretamente.
+
+*   **Cenário 3.4: Tentativa de Acesso a Propriedade Não Pública Diretamente**
+    *   **Pré-condições:** Conhecimento do ID ou slug de uma propriedade que tem `status='draft'` ou `status='pending_approval'`.
+    *   **Passos:**
+        1.  Tentar aceder diretamente à URL da página de detalhes dessa propriedade não pública (ex: `/imovel/slug-propriedade-draft`).
+    *   **Comportamento Esperado:**
+        1.  O servidor retorna um erro 404 (Não Encontrado).
+        2.  O utilizador vê uma página de erro 404 ou é redirecionado para uma página principal com uma mensagem informativa.
+        3.  Os detalhes da propriedade não pública não são exibidos.
+
+---
+
+**Módulo 4: Pesquisa e Filtros na Listagem Pública**
+
+*   **Cenário 4.1: Pesquisa Textual Simples**
+    *   **Pré-condições:** Página de listagem pública está visível. Existem propriedades com termos específicos no título, descrição ou localização (ex: "Praia", "vista mar", "T2").
+    *   **Passos:**
+        1.  Digitar "Praia" no campo de pesquisa textual.
+        2.  Submeter a pesquisa (clicar no botão "Pesquisar" ou pressionar Enter).
+    *   **Comportamento Esperado:**
+        1.  A lista de propriedades é atualizada, mostrando apenas propriedades que contêm "Praia" no título, descrição, localização, etc.
+        2.  Outros filtros (se aplicados anteriormente) são mantidos ou limpos, dependendo do comportamento definido. (Idealmente, a pesquisa textual é combinada com filtros existentes).
+
+*   **Cenário 4.2: Filtro por Localização (Ilha e/ou Concelho)**
+    *   **Pré-condições:** Página de listagem pública. Propriedades em diferentes ilhas/concelhos.
+    *   **Passos:**
+        1.  Selecionar "Santiago" no filtro de Ilha.
+        2.  (Opcional) Em seguida, selecionar "Praia" no filtro de Concelho.
+        3.  Aplicar os filtros.
+    *   **Comportamento Esperado:**
+        1.  A lista de propriedades é atualizada para mostrar apenas as que se localizam na Ilha de Santiago (e no Concelho da Praia, se selecionado).
+
+*   **Cenário 4.3: Filtro por Tipo de Propriedade**
+    *   **Pré-condições:** Página de listagem pública. Propriedades de diferentes tipos (ex: 'house', 'land', 'apartment').
+    *   **Passos:**
+        1.  Selecionar "Terreno" (ou 'land') no filtro de Tipo de Propriedade.
+        2.  Aplicar o filtro.
+    *   **Comportamento Esperado:**
+        1.  A lista mostra apenas propriedades do tipo "Terreno".
+
+*   **Cenário 4.4: Filtro por Faixa de Preço**
+    *   **Pré-condições:** Página de listagem pública. Propriedades com preços variados.
+    *   **Passos:**
+        1.  Definir um preço mínimo (ex: 5.000.000 CVE) e um preço máximo (ex: 10.000.000 CVE) nos controlos de filtro de preço.
+        2.  Aplicar os filtros.
+    *   **Comportamento Esperado:**
+        1.  A lista mostra apenas propriedades cujo `priceAmount` está entre 5.000.000 e 10.000.000 CVE (inclusive).
+
+*   **Cenário 4.5: Combinação de Múltiplos Filtros**
+    *   **Pré-condições:** Página de listagem pública.
+    *   **Passos:**
+        1.  Selecionar Ilha: "Sal".
+        2.  Selecionar Tipo: "Apartment".
+        3.  Definir Faixa de Preço: 8.000.000 - 12.000.000 CVE.
+        4.  Digitar na pesquisa textual: "novo".
+        5.  Aplicar todos os filtros/pesquisa.
+    *   **Comportamento Esperado:**
+        1.  A lista de propriedades é atualizada para mostrar apenas apartamentos na Ilha do Sal, com preço entre 8M e 12M CVE, e que contenham "novo" nos campos pesquisáveis. Todos os critérios são aplicados (lógica AND).
+
+*   **Cenário 4.6: Filtros Sem Resultados**
+    *   **Pré-condições:** Página de listagem pública.
+    *   **Passos:**
+        1.  Aplicar uma combinação de filtros muito específica que provavelmente não retornará resultados (ex: Ilha Brava, Tipo 'commercial_abandoned', Preço > 50.000.000 CVE).
+    *   **Comportamento Esperado:**
+        1.  A lista de propriedades fica vazia.
+        2.  Uma mensagem clara é exibida (ex: "Nenhuma propriedade encontrada com os critérios selecionados. Tente alargar a sua pesquisa.").
+
+*   **Cenário 4.7: Limpar Filtros**
+    *   **Pré-condições:** Vários filtros e/ou uma pesquisa textual estão aplicados.
+    *   **Passos:**
+        1.  Clicar no botão "Limpar Filtros" (ou similar).
+    *   **Comportamento Esperado:**
+        1.  Todos os controlos de filtro são resetados para o seu estado padrão.
+        2.  O campo de pesquisa textual é limpo.
+        3.  A lista de propriedades é recarregada para mostrar todas as propriedades ativas, com a ordenação padrão (como no Cenário 3.1).
+
+---
+
+**Módulo 5: Mapa Interativo**
+
+*   **Cenário 5.1: Exibição de Marcadores no Mapa**
+    *   **Pré-condições:** Página de listagem com a vista de mapa ativa/selecionada. Existem propriedades ativas com coordenadas GPS válidas.
+    *   **Passos:**
+        1.  Aceder à vista de mapa.
+    *   **Comportamento Esperado:**
+        1.  O mapa é inicializado e centrado numa vista apropriada (ex: Cabo Verde).
+        2.  Marcadores são exibidos nas localizações corretas para todas as propriedades ativas que possuem `locationGpsCoordinates` válidas e que correspondem aos filtros aplicados (se houver algum filtro ativo da listagem).
+
+*   **Cenário 5.2: Interação com Marcador - Pop-up**
+    *   **Pré-condições:** Mapa exibido com marcadores.
+    *   **Passos:**
+        1.  Clicar num marcador individual no mapa.
+    *   **Comportamento Esperado:**
+        1.  Um pop-up (info-window) aparece junto ao marcador.
+        2.  O pop-up contém informações básicas da propriedade (ex: imagem thumbnail, título, preço).
+        3.  O pop-up contém um link clicável para a página de detalhes completa dessa propriedade. Clicar no link navega para a página correta.
+
+*   **Cenário 5.3: Sincronização Mapa com Filtros da Página de Listagem**
+    *   **Pré-condições:** Página de listagem com filtros e mapa visíveis ou alternáveis.
+    *   **Passos:**
+        1.  Na secção de filtros da página, aplicar um filtro (ex: Ilha "Boa Vista").
+        2.  Observar a lista de propriedades (deve atualizar).
+        3.  Mudar para a vista de mapa (se não estiver já visível e sincronizada).
+    *   **Comportamento Esperado:**
+        1.  O mapa atualiza e exibe marcadores apenas para as propriedades que correspondem aos filtros aplicados (neste caso, apenas propriedades na Ilha da Boa Vista).
+        2.  Se a pesquisa textual for usada, o mapa também deve refletir os resultados dessa pesquisa.
+
+*   **Cenário 5.4: Clusterização de Marcadores (se implementado)**
+    *   **Pré-condições:** Mapa com múltiplas propriedades cujos marcadores estão geograficamente próximos. Funcionalidade de clusterização está ativa.
+    *   **Passos:**
+        1.  Visualizar o mapa com um nível de zoom relativamente baixo (afastado) numa área com alta densidade de propriedades.
+        2.  Aumentar o zoom (aproximar) sobre um cluster.
+    *   **Comportamento Esperado:**
+        1.  Em níveis de zoom mais baixos, marcadores próximos são agrupados em "clusters" que indicam o número de propriedades que representam.
+        2.  Ao clicar num cluster ou ao aumentar o zoom sobre ele, o cluster expande-se, revelando os marcadores individuais ou clusters menores.
+
+---
+
+**Módulo 6: Responsividade da Interface Pública**
+
+*   **Cenário 6.1: Visualização em Dispositivo Móvel (Smartphone)**
+    *   **Pré-condições:** N/A.
+    *   **Passos:**
+        1.  Aceder à página de listagem de imóveis num simulador de smartphone (ou dispositivo real).
+        2.  Tentar usar a pesquisa textual.
+        3.  Tentar abrir e usar os filtros avançados (ex: podem estar num modal ou menu off-canvas).
+        4.  Navegar pela lista de propriedades (deve ser de coluna única).
+        5.  Aceder à página de detalhes de uma propriedade. Verificar a legibilidade e disposição da galeria de imagens, descrição, etc.
+        6.  Aceder à vista de mapa e interagir com ele (pan, zoom, clique em marcadores).
+    *   **Comportamento Esperado:**
+        1.  O layout de todas as páginas (listagem, filtros, detalhes, mapa) adapta-se corretamente ao tamanho do ecrã do smartphone.
+        2.  Os textos são legíveis, botões e controlos são fáceis de tocar.
+        3.  A navegação (incluindo menu principal, que provavelmente será um "hambúrguer") é funcional.
+        4.  O mapa é utilizável, e os pop-ups dos marcadores são formatados para o ecrã menor.
+        5.  Não há overflow horizontal de conteúdo.
+
+*   **Cenário 6.2: Visualização em Tablet**
+    *   **Pré-condições:** N/A.
+    *   **Passos:**
+        1.  Repetir os passos do Cenário 6.1, mas num simulador de tablet (ou dispositivo real).
+    *   **Comportamento Esperado:**
+        1.  O layout adapta-se ao tamanho do ecrã do tablet, potencialmente mostrando mais colunas na listagem ou uma disposição diferente dos filtros em comparação com o smartphone.
+        2.  Todos os elementos são legíveis e interativos.
+        3.  O mapa aproveita o espaço adicional.
+
+---
+**Nota:** Estes cenários baseiam-se nas funcionalidades como foram definidas nas sub-tarefas anteriores. A "execução" será uma verificação conceptual da lógica e UI definidas.O arquivo `testing/public_discovery_test_scenarios.txt` foi criado com sucesso, detalhando os cenários de teste para a descoberta pública de propriedades.
+
+Agora, vou prosseguir com a "execução" simulada desses cenários e a documentação dos resultados.
+
+**2. Executar Cenários de Teste (Simulado) e 3. Reportar Resultados**
+
+Analisarei cada cenário e verificarei se a implementação simulada nas tarefas anteriores (Passos 1-3 deste plano de implementação) suporta o comportamento esperado.
+
+**Módulo 3: Visualização de Listagem e Detalhes de Propriedades Públicas**
+
+*   **Cenário 3.1 (Listagem Pública Padrão):**
+    *   **Execução Simulada:**
+        *   Frontend: Ao aceder a `/imoveis`, chama `GET /api/properties` sem parâmetros de filtro.
+        *   Backend: Endpoint (`PublicPropertyController.listProperties`) filtra por `status='active'` e `publishedAt <= NOW()`, aplica ordenação padrão (ex: `createdAt DESC`) e paginação.
+    *   **Resultado Simulado:** **SUCESSO**. A lógica para isto foi definida no Passo 1 (Visualização Pública).
+
+*   **Cenário 3.2 (Ordenação da Lista):**
+    *   **Execução Simulada:**
+        *   Frontend: Utilizador seleciona critério de ordenação (ex: "Preço Ascendente"). A página de listagem refaz a chamada a `GET /api/properties` com o parâmetro `sort_by=price_asc`.
+        *   Backend: Endpoint processa o `sort_by` e reordena os resultados.
+    *   **Resultado Simulado:** **SUCESSO**. O backend foi definido para aceitar `sort_by` e o frontend para reenviar a query.
+
+*   **Cenário 3.3 (Acesso à Página de Detalhes):**
+    *   **Execução Simulada:**
+        *   Frontend: Utilizador clica num link `/imovel/slug-da-propriedade`. A página de detalhes chama `GET /api/properties/slug-da-propriedade`.
+        *   Backend: Endpoint (`PublicPropertyController.getPropertyDetails`) busca a propriedade pelo slug, verifica se é pública, e retorna os dados completos.
+    *   **Resultado Simulado:** **SUCESSO**. A geração de slug e o endpoint de detalhe foram definidos.
+
+*   **Cenário 3.4 (Tentativa de Acesso a Propriedade Não Pública):**
+    *   **Execução Simulada:**
+        *   Frontend: Utilizador tenta aceder a `/imovel/slug-propriedade-draft`.
+        *   Backend: Endpoint busca a propriedade, verifica o status e, como não é 'active', retorna 404.
+    *   **Resultado Simulado:** **SUCESSO**. A lógica de verificação de status no endpoint de detalhe cobre isto.
+
+**Módulo 4: Pesquisa e Filtros na Listagem Pública**
+
+*   **Cenário 4.1 (Pesquisa Textual Simples):**
+    *   **Execução Simulada:**
+        *   Frontend: Input de pesquisa envia termo para `GET /api/properties` com o parâmetro `q=termo`.
+        *   Backend: Endpoint aplica a cláusula de pesquisa textual (`LIKE` em múltiplos campos) em conjunto com o filtro de status.
+    *   **Resultado Simulado:** **SUCESSO**. A API e a UI para pesquisa textual foram definidas no Passo 2 (Pesquisa e Filtros).
+
+*   **Cenário 4.2 (Filtro por Localização - Ilha/Concelho):**
+    *   **Execução Simulada:**
+        *   Frontend: Dropdowns de Ilha/Concelho adicionam `island=Santiago` e `municipality=Praia` à chamada da API.
+        *   Backend: Endpoint filtra por estes campos.
+    *   **Resultado Simulado:** **SUCESSO**.
+
+*   **Cenário 4.3 (Filtro por Tipo de Propriedade):**
+    *   **Execução Simulada:**
+        *   Frontend: Dropdown de Tipo adiciona `propertyType=land` à chamada da API.
+        *   Backend: Endpoint filtra por `propertyType`.
+    *   **Resultado Simulado:** **SUCESSO**.
+
+*   **Cenário 4.4 (Filtro por Faixa de Preço):**
+    *   **Execução Simulada:**
+        *   Frontend: Inputs de preço adicionam `priceMin=5000000` e `priceMax=10000000` à chamada da API.
+        *   Backend: Endpoint filtra por `priceAmount >= priceMin` e `priceAmount <= priceMax`.
+    *   **Resultado Simulado:** **SUCESSO**.
+
+*   **Cenário 4.5 (Combinação de Múltiplos Filtros):**
+    *   **Execução Simulada:**
+        *   Frontend: Todos os filtros selecionados são combinados numa única chamada à API (ex: `?q=novo&island=Sal&propertyType=apartment&priceMin=8000000&priceMax=12000000`).
+        *   Backend: Endpoint aplica todas as cláusulas de filtro com `AND`.
+    *   **Resultado Simulado:** **SUCESSO**. A lógica de combinação aditiva no backend foi definida.
+
+*   **Cenário 4.6 (Filtros Sem Resultados):**
+    *   **Execução Simulada:**
+        *   Frontend: Aplica filtros restritivos. API retorna lista vazia.
+        *   Frontend: Exibe mensagem "Nenhuma propriedade encontrada".
+    *   **Resultado Simulado:** **SUCESSO**. A UI foi definida para tratar este caso.
+
+*   **Cenário 4.7 (Limpar Filtros):**
+    *   **Execução Simulada:**
+        *   Frontend: Botão "Limpar Filtros" reseta os inputs e refaz a chamada à API sem parâmetros de filtro.
+    *   **Resultado Simulado:** **SUCESSO**.
+
+**Módulo 5: Mapa Interativo**
+
+*   **Cenário 5.1 (Exibição de Marcadores no Mapa):**
+    *   **Execução Simulada:**
+        *   Frontend: Ao ativar a vista de mapa, chama `GET /api/properties/map` (com filtros atuais). Leaflet renderiza marcadores para cada propriedade com `locationGpsCoordinates`.
+        *   Backend: Endpoint retorna dados otimizados para o mapa, filtrando por `locationGpsCoordinates` não nulas.
+    *   **Resultado Simulado:** **SUCESSO**. O endpoint e a lógica de UI para o mapa foram definidos no Passo 3 (Mapa Interativo).
+
+*   **Cenário 5.2 (Interação com Marcador - Pop-up):**
+    *   **Execução Simulada:**
+        *   Frontend: Leaflet configurado para mostrar pop-up ao clicar no marcador, com dados (título, preço, link) da propriedade.
+    *   **Resultado Simulado:** **SUCESSO**.
+
+*   **Cenário 5.3 (Sincronização Mapa com Filtros):**
+    *   **Execução Simulada:**
+        *   Frontend: Ao aplicar filtros na página, a chamada a `GET /api/properties/map` é refeita com os mesmos filtros, e o mapa é atualizado.
+    *   **Resultado Simulado:** **SUCESSO**. A lógica de sincronização foi definida.
+
+*   **Cenário 5.4 (Clusterização de Marcadores - se implementado):**
+    *   **Execução Simulada:**
+        *   Frontend: Se o plugin `Leaflet.markercluster` for usado, ele agruparia marcadores automaticamente.
+    *   **Resultado Simulado:** **SUCESSO** (assumindo que a biblioteca de clusterização seria usada conforme mencionado na implementação simulada do mapa).
+
+**Módulo 6: Responsividade da Interface Pública**
+
+*   **Cenário 6.1 (Visualização em Dispositivo Móvel):**
+    *   **Execução Simulada:**
+        *   Frontend: As diretrizes de responsividade (`design/responsiveness_guidelines.txt`) e as notas específicas nos arquivos de UI (`ui_definitions/public_properties_ui.txt`) foram aplicadas durante a simulação da construção das UIs. Isso inclui layouts de coluna única, menus hambúrguer, filtros em modais, e mapa adaptável.
+    *   **Resultado Simulado:** **SUCESSO**.
+
+*   **Cenário 6.2 (Visualização em Tablet):**
+    *   **Execução Simulada:** Similar ao mobile, o layout se ajustaria para aproveitar melhor o espaço do tablet.
+    *   **Resultado Simulado:** **SUCESSO**.
+
+**Identificação de Potenciais Problemas ou Áreas para Atenção na Implementação Real:**
+
+1.  **Performance da Pesquisa Textual (`q`):** Em bases de dados grandes, pesquisas `LIKE '%term%'` em múltiplos campos podem ser lentas. Uma solução de busca full-text (ex: Elasticsearch, ou funcionalidades nativas do DB como FTS do PostgreSQL) seria mais performática.
+2.  **Complexidade da Query de Filtros:** Combinar muitos filtros diferentes de forma eficiente pode ser desafiador. A otimização de queries e a correta indexação da base de dados são cruciais.
+3.  **UX dos Filtros:** Em mobile, a apresentação de muitos filtros precisa ser bem pensada (ex: modais, secções expansíveis) para não sobrecarregar o utilizador. A manutenção do estado dos filtros (e possivelmente na URL) adiciona complexidade ao frontend.
+4.  **Precisão das Coordenadas GPS:** A qualidade dos dados de `locationGpsCoordinates` é fundamental para a utilidade do mapa. Erros na entrada de dados podem levar a marcadores mal posicionados.
+5.  **Performance do Mapa com Muitos Marcadores:** Mesmo com clusterização, se milhares de propriedades precisarem ser enviadas para o cliente para exibição no mapa (após filtros), o volume de dados pode ser um problema. Estratégias como carregamento de marcadores baseados na viewport do mapa (map bounds) poderiam ser necessárias para escalas muito grandes, embora o endpoint `GET /api/properties/map` já filtre.
+6.  **Consistência dos Slugs:** A geração e manutenção de slugs únicos e persistentes para propriedades é importante para SEO e links permanentes.
+7.  **Tradução e Localização:** Embora não coberto, se a plataforma precisar suportar múltiplos idiomas, isso adicionaria complexidade à pesquisa, filtros e exibição de dados.
+
+**Conclusão da Simulação de Testes:**
+Todos os cenários de teste definidos para a descoberta pública de propriedades foram considerados "bem-sucedidos" com base na lógica de implementação simulada nas sub-tarefas anteriores. Os pontos identificados destacam áreas que exigiriam atenção especial e otimizações numa implementação real para garantir performance, usabilidade e robustez.
+
+Com isto, considero a "execução" dos cenários e a análise dos resultados concluídas. Posso submeter o relatório.

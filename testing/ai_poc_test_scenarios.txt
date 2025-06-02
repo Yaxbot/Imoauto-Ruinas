@@ -1,0 +1,135 @@
+Cenários de Teste - PoC da Funcionalidade de Transformação de Imóveis com IA
+
+**Pré-condições Globais para a maioria dos cenários:**
+*   Utilizador "poc_user@example.com" está logado.
+*   Existe uma propriedade "Propriedade para Teste de IA" com pelo menos uma imagem na galeria.
+*   A chave da API DeepAI está (simuladamente) configurada no backend.
+*   Limite diário de transformações por utilizador: 2 (para fins de teste da PoC).
+
+**Módulo 8: Fluxo Principal da Funcionalidade de IA**
+
+*   **Cenário 8.1: Transformação Bem Sucedida - Primeira do Dia**
+    *   **Pré-condições:** `poc_user@example.com` tem `aiTransformationsToday = 0` ou `lastAiTransformationDate` é de um dia anterior.
+    *   **Passos:**
+        1.  Utilizador navega para a página de detalhes da "Propriedade para Teste de IA".
+        2.  Na secção "Transformar com IA", seleciona uma imagem da galeria da propriedade.
+        3.  No campo de prompt, insere: "Tornar esta sala de estar mais moderna, com cores claras e muita luz natural."
+        4.  Clica no botão "Transformar com IA".
+    *   **Comportamento Esperado:**
+        1.  A UI exibe um indicador de progresso (ex: "A transformar imagem...").
+        2.  Pedido `POST /api/ai/transform-image` é enviado com `baseImageUrl` e o `prompt`.
+        3.  Backend:
+            *   Verifica/reseta o limite: `aiTransformationsToday` torna-se 0, `lastAiTransformationDate` é hoje.
+            *   Verifica que `0 < 2` (limite diário).
+            *   Chama a API da DeepAI com a imagem e o prompt.
+            *   (Simulação) DeepAI retorna sucesso com uma `transformed_image_url_1`.
+            *   Incrementa `aiTransformationsToday` para 1 no registo do utilizador.
+            *   Retorna 200 OK com `{ transformedImageUrl: "transformed_image_url_1", transformationsRemainingToday: 1 }`.
+        4.  UI:
+            *   Remove o indicador de progresso.
+            *   Exibe a imagem original ao lado da `transformed_image_url_1`.
+            *   Atualiza a contagem de transformações restantes para "1 transformação restante hoje."
+
+*   **Cenário 8.2: Transformação Bem Sucedida - Segunda do Dia**
+    *   **Pré-condições:** Cenário 8.1 foi executado no mesmo dia. `poc_user@example.com` tem `aiTransformationsToday = 1`, `lastAiTransformationDate` = hoje.
+    *   **Passos:**
+        1.  Utilizador, ainda na mesma página ou numa nova, seleciona outra imagem ou a mesma.
+        2.  No campo de prompt, insere: "Adicionar uma piscina a este jardim."
+        3.  Clica no botão "Transformar com IA".
+    *   **Comportamento Esperado:**
+        1.  UI exibe indicador de progresso.
+        2.  Pedido `POST /api/ai/transform-image` é enviado.
+        3.  Backend:
+            *   `lastAiTransformationDate` é hoje, `aiTransformationsToday` é 1.
+            *   Verifica que `1 < 2`.
+            *   Chama a API da DeepAI.
+            *   (Simulação) DeepAI retorna sucesso com `transformed_image_url_2`.
+            *   Incrementa `aiTransformationsToday` para 2.
+            *   Retorna 200 OK com `{ transformedImageUrl: "transformed_image_url_2", transformationsRemainingToday: 0 }`.
+        4.  UI:
+            *   Remove indicador de progresso.
+            *   Exibe a nova imagem transformada.
+            *   Atualiza a contagem para "0 transformações restantes hoje."
+            *   O botão "Transformar com IA" pode ficar desabilitado.
+
+*   **Cenário 8.3: Limite Diário Atingido**
+    *   **Pré-condições:** Cenário 8.2 foi executado no mesmo dia. `poc_user@example.com` tem `aiTransformationsToday = 2`, `lastAiTransformationDate` = hoje.
+    *   **Passos:**
+        1.  Utilizador tenta realizar uma terceira transformação (seleciona imagem, insere prompt).
+        2.  Clica no botão "Transformar com IA".
+    *   **Comportamento Esperado:**
+        1.  (Opcional) A UI pode já ter o botão desabilitado se `transformationsRemainingToday` for 0.
+        2.  Se o pedido for enviado: Pedido `POST /api/ai/transform-image` é enviado.
+        3.  Backend:
+            *   `lastAiTransformationDate` é hoje, `aiTransformationsToday` é 2.
+            *   Verifica que `2 >= 2` (limite atingido).
+            *   Retorna erro 429 (Too Many Requests) com `{ error: "Limite diário de transformações atingido.", transformationsRemainingToday: 0 }`.
+            *   Nenhuma chamada à API da DeepAI é feita.
+        4.  UI:
+            *   Exibe a mensagem de erro "Limite diário de transformações atingido."
+            *   Garante que o botão "Transformar com IA" está desabilitado.
+
+*   **Cenário 8.4: Reset do Limite no Dia Seguinte**
+    *   **Pré-condições:** Cenário 8.3 ocorreu num dia anterior (ex: ontem). `poc_user@example.com` tem `aiTransformationsToday = 2`, `lastAiTransformationDate` = ontem.
+    *   **Passos:**
+        1.  (Simular que a data atual é o dia seguinte ao de `lastAiTransformationDate`).
+        2.  Utilizador navega para a página de detalhes de uma propriedade.
+        3.  Seleciona uma imagem e insere um prompt.
+        4.  Clica no botão "Transformar com IA".
+    *   **Comportamento Esperado:**
+        1.  UI exibe indicador de progresso.
+        2.  Pedido `POST /api/ai/transform-image` é enviado.
+        3.  Backend:
+            *   Verifica que `lastAiTransformationDate` (ontem) é anterior à data atual.
+            *   Reseta `aiTransformationsToday` para 0 e atualiza `lastAiTransformationDate` para hoje.
+            *   Verifica que `0 < 2`.
+            *   Chama a API da DeepAI.
+            *   (Simulação) DeepAI retorna sucesso com `transformed_image_url_3`.
+            *   Incrementa `aiTransformationsToday` para 1.
+            *   Retorna 200 OK com `{ transformedImageUrl: "transformed_image_url_3", transformationsRemainingToday: 1 }`.
+        4.  UI:
+            *   Exibe a imagem transformada.
+            *   Atualiza a contagem para "1 transformação restante hoje."
+            *   Botão "Transformar com IA" está habilitado.
+
+---
+
+**Módulo 9: Casos de Erro e Comportamento da UI na Funcionalidade de IA**
+
+*   **Cenário 9.1 (Anteriormente 8.5): Prompt Vazio ou Imagem Não Selecionada**
+    *   **Pré-condições:** Utilizador logado na página de detalhe com a secção de IA visível.
+    *   **Passos:**
+        1.  Não seleciona nenhuma imagem da galeria OU não insere nenhum texto no campo de prompt.
+        2.  Clica no botão "Transformar com IA".
+    *   **Comportamento Esperado:**
+        1.  Validação no frontend (JavaScript) impede a chamada à API.
+        2.  Uma mensagem de erro é exibida na UI (ex: "Por favor, selecione uma imagem e insira um prompt.").
+        3.  Nenhuma chamada à API `/api/ai/transform-image` é feita.
+
+*   **Cenário 9.2 (Anteriormente 8.6): Erro na API da DeepAI (Simulado)**
+    *   **Pré-condições:** Utilizador logado, tem transformações restantes.
+    *   **Passos:**
+        1.  Utilizador seleciona imagem e insere prompt.
+        2.  Clica em "Transformar com IA".
+        3.  (Simulação no backend) A chamada à API da DeepAI falha (ex: DeepAI retorna erro 500, ou timeout, ou imagem base inválida para a DeepAI).
+    *   **Comportamento Esperado:**
+        1.  Pedido `POST /api/ai/transform-image` é enviado.
+        2.  Backend chama a DeepAI, que retorna um erro.
+        3.  Backend retorna um erro para o cliente (ex: 502 Bad Gateway ou 503 Service Unavailable) com uma mensagem como `{ "error": "Ocorreu um erro com o serviço de IA..." }`.
+        4.  `aiTransformationsToday` do utilizador NÃO é incrementado no backend.
+        5.  UI:
+            *   Exibe a mensagem de erro recebida da API interna.
+            *   A contagem de transformações restantes permanece inalterada.
+            *   O botão "Transformar com IA" permanece habilitado.
+
+*   **Cenário 9.3 (Anteriormente 8.7): Utilizador Não Logado Tentando Aceder à Funcionalidade**
+    *   **Pré-condições:** Utilizador não está logado.
+    *   **Passos:**
+        1.  Navegar para a página de detalhes de uma propriedade.
+        2.  Procurar pela secção "Transformar com IA".
+    *   **Comportamento Esperado:**
+        1.  A secção "Transformar com IA" não está visível ou está presente mas desabilitada com uma mensagem como "Faça login para experimentar a transformação com IA."
+        2.  Nenhuma funcionalidade de IA é interativa.
+
+---
+**Nota:** O limite de "2" transformações é apenas para o exemplo da PoC. O `stylePreset` opcional não foi incluído nestes cenários de PoC para simplificar, mas se fosse, seria mais um parâmetro a ser enviado e potencialmente usado para modificar o prompt enviado à DeepAI.
